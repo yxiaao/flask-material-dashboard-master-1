@@ -1,0 +1,608 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="container-fluid py-4" id = "main_screen">
+
+        <div class="row mb-4">
+            <div class="col-lg-11-5 col-md-6 mb-md-0 mb-4">
+              <div class="card">
+                <div class="card-header pb-0">
+                  <div class="row">
+                    <div class="col-lg-6 col-7">
+                      <h6>Contracts</h6>
+    {#                  <p class="text-sm mb-0">#}
+    {#                    <i class="fa fa-check text-info" aria-hidden="true"></i>#}
+    {#                    <span class="font-weight-bold ms-1">30 done</span> this month#}
+    {#                  </p>#}
+                    </div>
+                    <div class="col-lg-6 col-5 my-auto text-end">
+                      <div class="dropdown float-lg-end pe-4">
+                        <a class="cursor-pointer" id="dropdownTable" data-bs-toggle="dropdown" aria-expanded="false">
+                          <i class="fa fa-plus text-secondary"></i>
+                        </a>
+                        <ul class="dropdown-menu px-2 py-3 ms-sm-n4 ms-n5" aria-labelledby="dropdownTable">
+                          <li><a class="dropdown-item border-radius-md" id = "file_create_button" href="javascript:;">Create a new file</a></li>
+                          <li><a class="dropdown-item border-radius-md" id = "file_upload_button" href="javascript:;">Add a new file from local</a></li>
+    {#                      <li><a class="dropdown-item border-radius-md" href="javascript:;">Something else here</a></li>#}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body px-0 pb-2">
+                  <div class="table-responsive">
+                    <table class="table align-items-center mb-0">
+                      <thead>
+                        <tr>
+                          <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Contract Name</th>
+    {#                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Author</th>#}
+                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Last Modified</th>
+                          <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Tag</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div>
+                                <img src="/static/assets/img/small-logos/doc.svg" class="avatar avatar-sm me-3" alt="xd">
+                              </div>
+                              <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm" id = "link_1">Co-Branding Agreement_ Agency Agreement</h6>
+                              </div>
+                            </div>
+                          </td>
+    {#                      <td>#}
+    {#                        <div class="avatar-group mt-2">#}
+    {#                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Ryan Tompson">#}
+    {#                            <img src="/static/assets/img/team-1.jpg" alt="team1">#}
+    {#                          </a>#}
+    {#                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Romina Hadid">#}
+    {#                            <img src="/static/assets/img/team-2.jpg" alt="team2">#}
+    {#                          </a>#}
+    {#                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Alexander Smith">#}
+    {#                            <img src="/static/assets/img/team-3.jpg" alt="team3">#}
+    {#                          </a>#}
+    {#                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Jessica Doe">#}
+    {#                            <img src="/static/assets/img/team-4.jpg" alt="team4">#}
+    {#                          </a>#}
+    {#                        </div>#}
+    {#                      </td>#}
+                          <td class="align-middle text-center text-sm">
+                            <span class="text-xs font-weight-bold"> 2022/02/11 </span>
+                          </td>
+                          <td class="align-middle text-center">
+    {#                        <div class="progress-wrapper w-75 mx-auto">#}
+    {#                          <div class="progress-info">#}
+    {#                            <div class="progress-percentage">#}
+    {#                              <span class="text-xs font-weight-bold">80</span>#}
+    {#                            </div>#}
+    {#                          </div>#}
+    {#                          <div class="progress">#}
+    {#                            <div class="progress-bar bg-gradient-success w-80" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>#}
+    {#                          </div>#}
+    {#                        </div>#}
+                            <span class="badge badge-sm bg-gradient-success">Co-Branding Agreement</span>
+                            <span class="badge badge-sm bg-gradient-success">Agency Agreement</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div>
+                                <img src="/static/assets/img/small-logos/doc.svg" class="avatar avatar-sm me-3" alt="atlassian">
+                              </div>
+                              <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm">ABILITYINC_06_15_2020-EX-4.25</h6>
+                              </div>
+                            </div>
+                          </td>
+    {#                      <td>#}
+    {#                        <div class="avatar-group mt-2">#}
+    {#                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Romina Hadid">#}
+    {#                            <img src="/static/assets/img/team-2.jpg" alt="team5">#}
+    {#                          </a>#}
+    {#                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Jessica Doe">#}
+    {#                            <img src="/static/assets/img/team-4.jpg" alt="team6">#}
+    {#                          </a>#}
+    {#                        </div>#}
+    {#                      </td>#}
+                          <td class="align-middle text-center text-sm">
+                            <span class="text-xs font-weight-bold"> 2022/02/08 </span>
+                          </td>
+                          <td class="align-middle text-center">
+    {#                        <div class="progress-wrapper w-75 mx-auto">#}
+    {#                          <div class="progress-info">#}
+    {#                            <div class="progress-percentage">#}
+    {#                              <span class="text-xs font-weight-bold">80</span>#}
+    {#                            </div>#}
+    {#                          </div>#}
+    {#                          <div class="progress">#}
+    {#                            <div class="progress-bar bg-gradient-success w-80" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>#}
+    {#                          </div>#}
+    {#                        </div>#}
+                            <span class="badge badge-sm bg-gradient-success">SERVICES AGREEMENT</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div>
+                                <img src="/static/assets/img/small-logos/doc.svg" class="avatar avatar-sm me-3" alt="team7">
+                              </div>
+                              <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm">ACCELERATEDTECHNOLOGIESHOLDINGCORP_04_24_2003-EX-10.13</h6>
+                              </div>
+                            </div>
+                          </td>
+    {#                      <td>#}
+    {#                        <div class="avatar-group mt-2">#}
+    {#                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Romina Hadid">#}
+    {#                            <img src="/static/assets/img/team-3.jpg" alt="team8">#}
+    {#                          </a>#}
+    {#                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Jessica Doe">#}
+    {#                            <img src="/static/assets/img/team-1.jpg" alt="team9">#}
+    {#                          </a>#}
+    {#                        </div>#}
+    {#                      </td>#}
+                          <td class="align-middle text-center text-sm">
+                            <span class="text-xs font-weight-bold"> 2022/01/31 </span>
+                          </td>
+                          <td class="align-middle text-center">
+    {#                        <div class="progress-wrapper w-75 mx-auto">#}
+    {#                          <div class="progress-info">#}
+    {#                            <div class="progress-percentage">#}
+    {#                              <span class="text-xs font-weight-bold">80</span>#}
+    {#                            </div>#}
+    {#                          </div>#}
+    {#                          <div class="progress">#}
+    {#                            <div class="progress-bar bg-gradient-success w-80" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>#}
+    {#                          </div>#}
+    {#                        </div>#}
+                            <span class="badge badge-sm bg-gradient-success">JOINT VENTURE AGREEMENT</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div>
+                                <img src="/static/assets/img/small-logos/doc.svg" class="avatar avatar-sm me-3" alt="spotify">
+                              </div>
+                              <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm">ACCURAYINC_09_01_2010-EX-10.31</h6>
+                              </div>
+                            </div>
+                          </td>
+    {#                      <td>#}
+    {#                        <div class="avatar-group mt-2">#}
+    {#                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Ryan Tompson">#}
+    {#                            <img src="/static/assets/img/team-4.jpg" alt="user1">#}
+    {#                          </a>#}
+    {#                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Romina Hadid">#}
+    {#                            <img src="/static/assets/img/team-3.jpg" alt="user2">#}
+    {#                          </a>#}
+    {#                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Alexander Smith">#}
+    {#                            <img src="/static/assets/img/team-4.jpg" alt="user3">#}
+    {#                          </a>#}
+    {#                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Jessica Doe">#}
+    {#                            <img src="/static/assets/img/team-1.jpg" alt="user4">#}
+    {#                          </a>#}
+    {#                        </div>#}
+    {#                      </td>#}
+                          <td class="align-middle text-center text-sm">
+                            <span class="text-xs font-weight-bold"> 2022/01/14 </span>
+                          </td>
+                          <td class="align-middle text-center">
+    {#                        <div class="progress-wrapper w-75 mx-auto">#}
+    {#                          <div class="progress-info">#}
+    {#                            <div class="progress-percentage">#}
+    {#                              <span class="text-xs font-weight-bold">80</span>#}
+    {#                            </div>#}
+    {#                          </div>#}
+    {#                          <div class="progress">#}
+    {#                            <div class="progress-bar bg-gradient-success w-80" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>#}
+    {#                          </div>#}
+    {#                        </div>#}
+                            <span class="badge badge-sm bg-gradient-success">DISTRIBUTOR AGREEMENT</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div>
+                                <img src="/static/assets/img/small-logos/doc.svg" class="avatar avatar-sm me-3" alt="jira">
+                              </div>
+                              <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm">ADAMSGOLFINC_03_21_2005-EX-10.17</h6>
+                              </div>
+                            </div>
+                          </td>
+    {#                      <td>#}
+    {#                        <div class="avatar-group mt-2">#}
+    {#                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Ryan Tompson">#}
+    {#                            <img src="/static/assets/img/team-4.jpg" alt="user5">#}
+    {#                          </a>#}
+    {#                        </div>#}
+    {#                      </td>#}
+                          <td class="align-middle text-center text-sm">
+                            <span class="text-xs font-weight-bold"> 2021/12/31 </span>
+                          </td>
+                          <td class="align-middle text-center">
+    {#                        <div class="progress-wrapper w-75 mx-auto">#}
+    {#                          <div class="progress-info">#}
+    {#                            <div class="progress-percentage">#}
+    {#                              <span class="text-xs font-weight-bold">80</span>#}
+    {#                            </div>#}
+    {#                          </div>#}
+    {#                          <div class="progress">#}
+    {#                            <div class="progress-bar bg-gradient-success w-80" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>#}
+    {#                          </div>#}
+    {#                        </div>#}
+                            <span class="badge badge-sm bg-gradient-success">endorsement agreement</span>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>
+                            <div class="d-flex px-2 py-1">
+                              <div>
+                                <img src="/static/assets/img/small-logos/doc.svg" class="avatar avatar-sm me-3" alt="invision">
+                              </div>
+                              <div class="d-flex flex-column justify-content-center">
+                                <h6 class="mb-0 text-sm">ADAPTIMMUNETHERAPEUTICSPLC_04_06_2017-EX-10.11</h6>
+                              </div>
+                            </div>
+                          </td>
+    {#                      <td>#}
+    {#                        <div class="avatar-group mt-2">#}
+    {#                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Ryan Tompson">#}
+    {#                            <img src="/static/assets/img/team-1.jpg" alt="user6">#}
+    {#                          </a>#}
+    {#                          <a href="javascript:;" class="avatar avatar-xs rounded-circle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Jessica Doe">#}
+    {#                            <img src="/static/assets/img/team-4.jpg" alt="user7">#}
+    {#                          </a>#}
+    {#                        </div>#}
+    {#                      </td>#}
+                          <td class="align-middle text-center text-sm">
+                            <span class="text-xs font-weight-bold"> 2021/12/21 </span>
+                          </td>
+                          <td class="align-middle text-center">
+    {#                        <div class="progress-wrapper w-75 mx-auto">#}
+    {#                          <div class="progress-info">#}
+    {#                            <div class="progress-percentage">#}
+    {#                              <span class="text-xs font-weight-bold">80</span>#}
+    {#                            </div>#}
+    {#                          </div>#}
+    {#                          <div class="progress">#}
+    {#                            <div class="progress-bar bg-gradient-success w-80" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100"></div>#}
+    {#                          </div>#}
+    {#                        </div>#}
+                            <span class="badge badge-sm bg-gradient-success">STRATEGIC ALLIANCE AGREEMENT</span>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+      {% include 'includes/footer.html' %}
+    </div>
+    <div class="row py-3" id = "file_create">
+        <form action="/document.html" method="get">
+            <div class="input_1"><h5 class="text-xl">New Contract</h5></div>
+            <div class="ms-md-auto py-3 d-flex align-items-center">
+                <div class="input-group input-group-outline">
+                 <label class="form-label">Contract Name</label>
+                 <input type="text" name = "input_name" class="form-control">
+                </div>
+            </div>
+            <input type="submit" value="Create" id = "create_confirm" class="btn btn-outline-primary btn-sm mb-0 me-4">
+            <button type="button" id = "cancel_confirm" class="btn btn-outline-primary btn-sm mb-0 ms-4">Cancel</button>
+        </form>
+    </div>
+
+    <div class="row py-3" id = "file_upload">
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <div class="input_1"><h5 class="text-xl">Upload Contract</h5></div>
+            <div class="ms-md-auto py-3 d-flex align-items-center">
+                <div class="input-group input-group-outline" id="upload_block"><span id="upload_span_button" class="btn-outline-primary btn-sm">Select</span>
+                <span id="upload_span_name">No file selected</span>
+                 <input type="file" name = "input_file" class="form-control" onchange="javascript:{document.getElementById('upload_span_name').innerHTML = (document.getElementsByName('input_file'))[0].value}">
+
+                </div>
+                <div class="fileInfo"></div>
+            </div>
+            <input type="submit" value="Upload" id = "upload_confirm" class="btn btn-outline-primary btn-sm mb-0 me-4">
+            <button type="button" id = "cancel_upload" class="btn btn-outline-primary btn-sm mb-0 ms-4">Cancel</button>
+        </form>
+    </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+  <script src="/static/assets/js/plugins/chartjs.min.js"></script>
+  <script>
+    var create_button = document.getElementById("file_create_button");
+    var cancel_button = document.getElementById("cancel_confirm");
+    var confirm_bar = document.getElementById("file_create");
+    var input_name = document.getElementsByName("input_name");
+    cancel_button.onclick = function(){
+        input_name[0].value = '';
+        confirm_bar.style.visibility = 'hidden';
+
+    }
+    create_button.onclick = function(){
+        confirm_bar.style.visibility = 'visible';
+    }
+
+    var upload_button = document.getElementById("file_upload_button");
+    var cancel_upload = document.getElementById("cancel_upload");
+    var upload_bar = document.getElementById("file_upload");
+    var upload_file = document.getElementsByName("input_file");
+    cancel_upload.onclick = function(){
+        upload_bar.style.visibility = 'hidden';
+        upload_file[0].value = '';
+    }
+    upload_button.onclick = function(){
+        upload_bar.style.visibility = 'visible';
+    }
+
+    var ctx = document.getElementById("chart-bars").getContext("2d");
+
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: ["M", "T", "W", "T", "F", "S", "S"],
+        datasets: [{
+          label: "Sales",
+          tension: 0.4,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          backgroundColor: "rgba(255, 255, 255, .8)",
+          data: [50, 20, 10, 22, 50, 10, 40],
+          maxBarThickness: 6
+        }, ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              suggestedMin: 0,
+              suggestedMax: 500,
+              beginAtZero: true,
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+              color: "#fff"
+            },
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+
+    var ctx2 = document.getElementById("chart-line").getContext("2d");
+
+    new Chart(ctx2, {
+      type: "line",
+      data: {
+        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        datasets: [{
+          label: "Mobile apps",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(255, 255, 255, .8)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(255, 255, 255, .8)",
+          borderColor: "rgba(255, 255, 255, .8)",
+          borderWidth: 4,
+          backgroundColor: "transparent",
+          fill: true,
+          data: [50, 40, 300, 320, 500, 350, 200, 230, 500],
+          maxBarThickness: 6
+
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: false,
+              drawOnChartArea: false,
+              drawTicks: false,
+              borderDash: [5, 5]
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+
+    var ctx3 = document.getElementById("chart-line-tasks").getContext("2d");
+
+    new Chart(ctx3, {
+      type: "line",
+      data: {
+        labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        datasets: [{
+          label: "Mobile apps",
+          tension: 0,
+          borderWidth: 0,
+          pointRadius: 5,
+          pointBackgroundColor: "rgba(255, 255, 255, .8)",
+          pointBorderColor: "transparent",
+          borderColor: "rgba(255, 255, 255, .8)",
+          borderWidth: 4,
+          backgroundColor: "transparent",
+          fill: true,
+          data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
+          maxBarThickness: 6
+
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false,
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index',
+        },
+        scales: {
+          y: {
+            grid: {
+              drawBorder: false,
+              display: true,
+              drawOnChartArea: true,
+              drawTicks: false,
+              borderDash: [5, 5],
+              color: 'rgba(255, 255, 255, .2)'
+            },
+            ticks: {
+              display: true,
+              padding: 10,
+              color: '#f8f9fa',
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+          x: {
+            grid: {
+              drawBorder: false,
+              display: false,
+              drawOnChartArea: false,
+              drawTicks: false,
+              borderDash: [5, 5]
+            },
+            ticks: {
+              display: true,
+              color: '#f8f9fa',
+              padding: 10,
+              font: {
+                size: 14,
+                weight: 300,
+                family: "Roboto",
+                style: 'normal',
+                lineHeight: 2
+              },
+            }
+          },
+        },
+      },
+    });
+  </script>
+
+{% endblock javascripts %}

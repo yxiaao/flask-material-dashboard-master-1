@@ -1,0 +1,86 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Tables {% endblock %} 
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+  <div class="container-fluid py-4">
+    <div class="row">
+      <div class="col-lg-6 col-7">
+        <h2>{{ documentData['input_name'] }}</h2>
+      </div>
+    </div>
+    <div class="row" id = "total">
+
+      <div class="col-6" style="height: 74vh">
+          <div class="card mt-4" style="height: 100%">
+              <div class="checking_area" id = "left">  </div>
+          </div>
+      </div>
+      <div class="col-6" >
+          <div class="card my-4">
+            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+                <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+                    <h6 class="text-white text-capitalize ps-3">Summarize</h6>
+                </div>
+            </div>
+            <div class="card-body px-2 py-2" id = "summarized_right"></div>
+          </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.js"></script>
+    <script>
+        var documentData = {{ documentData | tojson }};
+        var contractText = documentData['content'];
+        var data = documentData['result'].Summarize;
+
+        let left = document.getElementById('left');
+        let right = document.getElementById('summarized_right');
+
+
+        {#let summarizedContract = "";#}
+        let paragraphContract = "";
+        for(let i = 0; i < data.sum.length; i++){
+            paragraphContract = paragraphContract + '<div class = "para_jump" >' + data.para[i].text + '</div>' + "\r\n\r\n";
+            {#summarizedContract = summarizedContract + '<div class = "sum_para" id = "sum' + i + '">' + data.sum[i].text + '</div>' + "\r\n\r\n";#}
+        }
+        left.innerHTML = paragraphContract;
+        {#right.innerHTML = summarizedContract;#}
+
+        let paras = document.getElementsByClassName("para_jump");
+        for(let i = 0; i < paras.length; i++){
+            paras[i].onclick = function(){
+                right.innerHTML = '<div class = "sum_para" id = "sum' + i + '">' + data.sum[i].text + '</div>';
+            }
+        }
+        {##}
+        {#let flag = true;#}
+        {#let scale = (left.scrollHeight - left.clientHeight) / (right.scrollHeight - right.clientHeight);#}
+        {#left.addEventListener('mouseover', function(e){#}
+        {#    flag = false;#}
+        {#    left.addEventListener('scroll',function(e){#}
+        {#        if(!flag){#}
+        {#            right.scrollTop = left.scrollTop / scale;#}
+        {#        }#}
+        {#    })#}
+        {# });#}
+        {#right.addEventListener('mouseover', function (e) {#}
+        {#    flag = true;#}
+        {#    right.addEventListener('scroll',function(e){#}
+        {#        if(flag){#}
+        {#            left.scrollTop = right.scrollTop * scale;#}
+        {#        }#}
+        {#    })#}
+        {# })#}
+   </script>
+{% endblock javascripts %}
+

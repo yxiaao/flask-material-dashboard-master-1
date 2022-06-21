@@ -1,0 +1,203 @@
+
+  <div class="fixed-plugin">
+    <a class="fixed-plugin-button text-dark position-fixed px-3 py-2">
+      <i class="material-icons py-2">chat</i>
+    </a>
+    <div class="card shadow-lg" style = "padding: 0;">
+      <div class="card-body pt-0" style = "padding: 0;">
+
+          <div class="chat-box">
+                <div class ="chat-window">
+                    <div class="chat-window-title">Online ChatBot
+                        <button class="btn btn-link text-dark p-0 fixed-plugin-close-button" style = "float: right;">
+                            <i class="material-icons">clear</i>
+                        </button></div>
+                    <div id = "chat-content" class ="chat-window-content">
+                        <div class="chat-user">
+                          <p>
+                            <span class="user-time">2022/4/3 17:52:18&nbsp;&nbsp;Visitor</span>
+                            <span class="chat-userval" style="">Hello</span>
+                            <span class ="user-trangle" style=""></span>
+                          </p>
+                          <img class = "headimg" src="/static/assets/img/team-1.jpg">
+                        </div>
+                        <div class="chat-bot">
+                          <p>
+                           <span class = bot-time>ChatBot&nbsp;&nbsp;2022/4/3 17:52:19</span>
+                           <span class="chat-botval">Hello. How can I help you? </span>
+                           <span class = "bot-trangle" style=""></span>
+                          </p>
+                          <img class = headimg src="/static/assets/img/team-2.jpg">
+                        </div></div>
+                 <div id="chat-footer" style="display: flex; justify-content: space-around; text-align: center; bottom: 0px; left: 0px; right: 0px; background: white none repeat scroll 0% 0%;">
+                    <textarea id = "chat-textarea" style="" maxlength="500"></textarea>
+                    <input type="button" id="send-button" value="Send" style="background-color: rgb(0, 150, 136); margin-top: 0.75rem; line-height: 2.5rem; height: 2.5rem; margin-left: 0.5rem; padding: 0px 11px; color: rgb(255, 255, 255); border-radius: 3px; border: medium none; font-size: 15px; outline: currentcolor none medium; cursor: pointer; box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px; appearance: none; margin-right: 0.5rem;">
+                 </div>
+                </div>
+                </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+      var sendButton = document.getElementById("send-button");
+      sendButton.onclick = function(){
+
+          let textArea = document.getElementById("chat-textarea");
+          if(textArea.value == "" || textArea.value == null){
+              alert("no message to send");
+              return;
+          }
+          let content = document.getElementById("chat-content");
+          let newChat = document.createElement("div");
+            newChat.className = "chat-user";
+          let message = document.createElement("p");
+          message.innerHTML = '<span class="user-time">' + (new Date()).toLocaleString() + '&nbsp;&nbsp;Visitor</span> <span class="chat-userval">' + textArea.value+ '</span> <span class ="user-trangle"></span>'
+          let head = document.createElement("img");
+          head.src = "/static/assets/img/team-1.jpg";
+          head.className = "headimg";
+          newChat.append(message);
+          newChat.append(head);
+          content.append(newChat);
+          textArea.value = "";
+          content.scrollTop = content.scrollHeight;
+          setTimeout(function(){
+              let content = document.getElementById("chat-content");
+              let newChat = document.createElement("div");
+
+                    newChat.className = "chat-bot";
+          let message = document.createElement("p");
+          message.innerHTML = '<span class="bot-time">' + 'ChatBot&nbsp;&nbsp;' + (new Date()).toLocaleString() + '</span> <span class="chat-botval">' + 'Artificial intelligence (AI) is intelligence demonstrated by machines, as opposed to the natural intelligence displayed by animals including humans. You can know more in <a href="https://en.wikipedia.org/wiki/Artificial_intelligence">https://en.wikipedia.org/wiki/Artificial_intelligence</a>'+ '</span> <span class ="bot-trangle"></span>'
+          let head = document.createElement("img");
+              head.src = "/static/assets/img/team-2.jpg";
+              head.className = "headimg";
+              newChat.append(message);
+              newChat.append(head);
+              content.append(newChat);
+              content.scrollTop = content.scrollHeight;
+          }, 2000);
+
+      }
+  </script>
+
+  <style>
+      .chat-box{
+          padding-right: 2%;
+          height: 100%;
+      }
+      .chat-window{
+    height: 100%;
+    left: 50%;
+    top: 50%;
+    box-shadow: rgb(173, 173, 173) 0px 3px 29px 0px;
+    background: whitesmoke none repeat scroll 0% 0%;
+    overflow: hidden;
+    z-index: 2147483647;
+}
+      .user-trangle{
+          position: absolute;top: 45px;right: 47px;width: 0;height: 0;border-style: solid dashed dashed;border-color: #009688 transparent transparent;overflow: hidden;border-width: 10px;
+      }
+
+      .bot-trangle{
+          position: absolute;top: 45px;left: 47px;width: 0;height: 0;border-style: solid dashed dashed;border-color: #6793e0 transparent transparent;overflow: hidden;border-width: 10px;
+      }
+
+.chat-window-title{
+  height: 56px; background: rgb(103, 147, 224) none repeat scroll 0% 0%; line-height: 56px; padding-left: 13px; font-size: 21px; font-weight: bold; color: white;
+}
+
+.chat-box-min{
+  position: absolute; width: 15px; height: 3px; right: 22px; top: 23px; background-color: rgb(0, 0, 0); cursor: pointer;
+}
+
+.chat-window-content{
+  height: 26rem; overflow: auto; background: whitesmoke none repeat scroll 0% 0%; padding: 0px 6px;
+}
+
+.chat-user{
+  margin: 20px 0px 20px;
+    clear:both;
+    float: right;
+    position: relative;
+
+}
+
+.chat-bot{
+  margin: 20px 0px 20px;clear:both;float: left;position: relative;
+}
+
+.chat-user p{
+  float: left;
+}
+
+.chat-bot p{
+  float: right;
+}
+
+.chat-userval{
+  float: right;
+  display:block;
+  clear: both;
+  background:#009688;
+  padding:8px 15px;
+  border-radius: 5px;
+  color: white;
+  max-width: 225px;
+  margin-right: 8px;
+  line-height: 25px;
+}
+
+.chat-botval{
+    float: left;
+  display:block;
+  clear: both;
+  background:#6793e0;
+  padding:8px 15px;
+  border-radius: 5px;
+  color: white;
+  max-width: 225px;
+  margin-left: 8px;
+  line-height: 25px;
+}
+
+.chat-bot .headimg{
+  width:39px;float:left;margin-top:10px;margin-right: 10px;border-radius: 50%;
+}
+
+.chat-user .headimg{
+  width:39px;float:right;margin-top:10px;margin-left: 10px;border-radius: 50%;
+}
+
+.user-time{
+  margin-right: 7px;
+  color:#999;
+  font-size:13px;
+  margin-bottom:5px;
+  display:block;
+  float:right;
+}
+
+.bot-time{
+  margin-left: 7px;
+  color:#999;
+  font-size:13px;
+  margin-bottom:5px;
+  display:block;
+  float:left;
+}
+
+#chat-textarea{
+    resize: none;
+    width: 83%;
+    height: 3.5rem;
+    border: medium none;
+    float: left;
+    outline: currentcolor none medium;
+    margin: 2%;
+    border-radius: 3px;
+    font-size: 14px;
+    background-color: #eee;
+    font-color: #2f2e2e;
+    padding: 1% 2%;
+}
+  </style>

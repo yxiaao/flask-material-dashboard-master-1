@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>知识图谱</title>
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="" />
+    <link rel="shortcut icon" href="">
+    <script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.js"></script>
+    <link href="http://cdn.bootcss.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+    <script src="http://cdn.bootcss.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+</head>
+<style type="text/css">
+
+	html{
+		height: 100vh;
+		width: 100vw;
+	}
+body {
+	background-color: #272b30;
+	padding: 30px 40px;
+	height: 90vh;
+	text-align: center;
+    font-family: OpenSans-Light, PingFang SC, Hiragino Sans GB, Microsoft Yahei, Microsoft Jhenghei, sans-serif;
+}
+
+#indicator {
+	position: absolute; 
+	left: 60px;
+	bottom: 120px;
+    text-align: left;
+    color: #f2f2f2;
+    font-size: 12px;
+}
+
+#indicator>div {
+    margin-bottom: 4px;
+}
+
+#indicator span {
+    display: inline-block;
+    width: 30px;
+    height: 14px;
+    position: relative;
+    top: 2px;
+    margin-right: 8px;
+}
+
+.links line {
+	stroke: rgb(240, 240, 240); 
+	/* stroke-opacity: 0.2; */
+}
+
+.links line.inactive {
+    /*display: none !important;*/
+    stroke-opacity: 0.2;
+}
+.nodes g .inactive{
+	opacity: 0.2;
+}
+
+.nodes circle {
+	stroke: #fff;
+	stroke-width: 1.5px;
+
+}
+
+.nodes circle:hover {
+    cursor: pointer;
+
+}
+
+.nodes circle.inactive {
+	/* display: none !important; */
+	opacity: 0.2;
+	/* transition-duration:0.2s; */
+	/* transition-timing-function: linear; */
+
+
+}
+.nodes text.inactive{
+	opacity: 0.2;
+}
+.texts text {
+    display: none;
+}
+
+.texts text:hover {
+    cursor: pointer;
+}
+
+.texts text.inactive {
+    /* display: none !important; */
+	opacity: 0.2;
+	transform: scale(1,2.1,2);
+	transition-timing-function: linear;
+}
+
+
+
+#mode {
+    position: absolute;
+    top: 160px;
+    left: 60px;
+}
+
+#mode span {
+    display: inline-block;
+    border: 1px solid #fff;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: color, background-color .3s;
+    -o-transition: color, background-color .3s;
+    -ms-transition: color, background-color .3s;
+    -moz-transition: color, background-color .3s;
+    -webkit-transition: color, background-color .3s;
+}
+
+#mode span.active, #mode span:hover {
+    background-color: #fff;
+    color: #333;
+    cursor: pointer;
+}
+
+
+
+</style>
+<body>
+
+	<!-- 绘制标题样式 -->
+	<h1 style="color:#fff;font-size:32px;margin-bottom:0px;text-align:center;margin-left:40px;">I-on. (LOGO) www.i-on.com 561.394.9484 o 561.394-9773 fax 1733 avenida del sol, boca raton, florida, 33432</h1>
+
+	<!-- 第一个布局 绘制知识图谱主图 -->
+	<div style="text-align: center; position:relative;">
+		<svg width="2400" height="1200" style="margin-right:80px;margin-bottom:-40px;" id="svg1">
+    	</svg>
+
+    	<!-- 绘制图例 -->
+		<div id="indicator">
+	    </div>
+
+	    <!-- 绘制模式选择
+	    <div id="mode">
+	    	<span class="active" style="border-top-right-radius:0;border-bottom-right-radius:0;">节点</span>
+            <span style="border-top-left-radius:0;border-bottom-left-radius:0;position:relative;left:-5px;">文字</span>
+	    </div> -->
+
+	    <!-- 绘制搜索框 -->
+	    <div id="search">
+	    </div>
+
+	    <!-- 绘制右边显示结果 -->
+	    <div id="info">
+	    </div>
+	</div>
+
+	<!-- 第二个布局 下部分时间点 文本居中 相对定位-->
+	<!-- <div style="text-align: center; position:relative;">
+		<svg width="960" height="240" style="margin-right:60px;margin-bottom:-40px;" id="svg1">
+			<g></g>
+    	</svg>
+	</div> -->
+
+</body>
+
+<!-- 增加D3元素库 -->
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<!-- 补充JS代码 -->
+<script type="text/javascript">
+	$(document).ready(function() {
+		//定义svg变量将布局svg1选出来 
+		var svg = d3.select("#svg1"), 
+			width = svg.attr("width"), 
+			height = svg.attr("height");
+
+		//定义name变量制作图标
+		var names = ['Center', 'Large', 'Small', 'Dot'];
+		var colors = ['#6ca46c', '#4e88af', '#ca635f', '#d2907c'];
+
+		//背景颜色设置 补充CSS样式设置字体布局
+		for (var i=0; i < names.length; i++) {
+			$('#indicator').append("<div><span style='background-color:" + colors[i] + "'></span>" + names[i] + "</div>");
+		}
+
+		//利用d3.forceSimulation()定义关系图 包括设置边link、排斥电荷charge、关系图中心点
+		var simulation = d3.forceSimulation()
+	        .force("link", d3.forceLink().id(function(d) {
+	            return d.id;
+	        }).distance(function(d){
+				return 160;
+			}))
+	        .force("charge", d3.forceManyBody())
+	        .force("center", d3.forceCenter(width / 2, height / 2))
+			.force("collide", d3.forceCollide().radius(function(d){
+				return 4*d.size;
+			}));
+
+
+	    //存储关系图的数据
+	    var graph;
+
+	    //定义d3.json请求python处理好的节点及边 请求成功返回数据，否则报错
+graph = {
+  "nodes": [
+    {
+      "id": 0,
+      "label": "WEB SITE HOSTING AGREEMENT",
+      "type": 1,
+      "size": 40,
+      "index": 0,
+      "x": 1366.2902842155083,
+      "y": 660.2938650643166,
+      "vy": -0.02810393774215856,
+      "vx": 0.0004333891276433242
+    },
+    {
+      "id": 1,
+      "label": "6th day of April, 1999",
+      "type": 0,
+      "size": 10,
+      "index": 1,
+      "x": 1562.5159063567926,
+      "y": 698.8712949665377,
+      "vy": -0.028922018961805462,
+      "vx": 0.0010532446835192731
+    },
+    {
+      "id": 2,
+      "label": "6th day of April, 1999",
+      "type": 0,
+      "size": 10,
+      "index": 2,
+      "x": 1561.9290726860336,
+      "y": 618.9084276396183,
+      "vy": -0.029716155859555924,
+      "vx": 0.0008675979442786812
+    },
+    {
+      "id": 3,
+      "label": "govern law",
+      "type": 3,
+      "size": 20,
+      "index": 3,
+      "x": 1388.1967909121995,
+      "y": 911.8106477488168,
+      "vy": -0.023339837367584115,
+      "vx": 0.002264690880938366
+    },
+    {
+      "id": 4,
+      "label": "State of Florida",
+      "type": 0,
+      "size": 10,
+      "index": 4,
+      "x": 1531.7488780211595,
+      "y": 772.6463053758665,
+      "vy": -0.02764173768505358,
+      "vx": 0.00017970603522793476
+    },
+    {
+      "id": 5,
+      "label": "for one (1) or more one (1) month periods",
+      "type": 0,
+      "size": 10,
+      "index": 5,
+      "x": 1474.4729596259162,
+      "y": 828.4985136758149,
+      "vy": -0.027657162152552064,
+      "vx": 0.00016466496921413025
+    },
+    {
+      "id": 6,
+      "label": "the Hosted Site",
+      "type": 1,
+      "size": 40,
+      "index": 6,
+      "x": 1148.8866691844617,
+      "y": 895.0784387905154,
+      "vy": -0.02781537659048536,
+      "vx": 0.00010732450708752367
+    },
+    {
+      "id": 7,
+      "label": "the Hosting Computer",
+      "type": 2,
+      "size": 32,
+      "index": 7,
+      "x": 511.2091887823154,
+      "y": 702.4054860776564,
+      "vy": -0.024906557482926257,
+      "vx": 0.010363578126942333
+    },
+    {
+      "id": 8,
+      "label": "Internet",
+      "type": 3,
+      "size": 20,
+      "index": 8,
+      "x": 944.0594605305661,
+      "y": 770.2132043951846,
+      "vy": -0.021446591114078428,
+      "vx": -0.006950559167598907
+    },
+    {
+      "id": 9,
+      "label": "i-on interactive",
+      "type": 1,
+      "size": 40,
+      "index": 9,
+      "x": 778.908454281023,
+      "y": 596.2547563423709,
+      "vy": -0.037787408321443505,
+      "vx": 0.00583561683222685
+    },
+    {
+      "id": 10,
+      "label": "The Customer",
+      "type": 1,
+      "size": 40,
+      "index": 10,
+      "x": 1150.2958746853187,
+      "y": 335.23753680440564,
+      "vy": -0.029185259407248764,
+      "vx": -0.004607317633224393
+    },
+    {
+      "id": 11,
+      "label": "Centrack International",
+      "type": 0,
+      "size": 10,
+      "index": 11,
+      "x": 1053.0465602314202,
+      "y": 160.5503010332768,
+      "vy": -0.038655137062394214,
+      "vx": 0.009130591099669426
+    },
+    {
+      "id": 13,
+      "label": "Microsoft Windows NT Server",
+      "type": 3,
+      "size": 20,
+      "index": 12,
+      "x": 515.208096404943,
+      "y": 910.3357974317825,
+      "vy": -0.024002893763788287,
+      "vx": 0.0015508012139371001
+    },
+    {
+      "id": 14,
+      "label": "Microsoft Internet Information Service",
+      "type": 3,
+      "size": 20,
+      "index": 13,
+      "x": 684.8447737017443,
+      "y": 816.9528409008994,
+      "vy": -0.03178406296426758,
+      "vx": 0.014470769113897951
+    },
+    {
+      "id": 15,
+      "label": "Microsoft SQL Server",
+      "type": 3,
+      "size": 20,
+      "index": 14,
+      "x": 661.423378989639,
+      "y": 975.2405322616876,
+      "vy": -0.0332560940969329,
+      "vx": 0.006330195344712524
+    },
+    {
+      "id": 16,
+      "label": "Web site administration",
+      "type": 0,
+      "size": 10,
+      "index": 15,
+      "x": 584.0786864022477,
+      "y": 551.0709271062337,
+      "vy": -0.0289766570914322,
+      "vx": 0.0038049384881081293
+    },
+    {
+      "id": 17,
+      "label": "month report",
+      "type": 2,
+      "size": 32,
+      "index": 16,
+      "x": 1081.8767478966279,
+      "y": 615.015731658323,
+      "vy": -0.028616832793826853,
+      "vx": 0.0005241035554621664
+    },
+    {
+      "id": 18,
+      "label": "monthly fee",
+      "type": 0,
+      "size": 10,
+      "index": 17,
+      "x": 1283.0158757058884,
+      "y": 185.71897517511434,
+      "vy": -0.031553157564359384,
+      "vx": -0.004651397217449915
+    },
+    {
+      "id": 19,
+      "label": "interruption",
+      "type": 0,
+      "size": 10,
+      "index": 18,
+      "x": 1331.022081857802,
+      "y": 249.6742370014957,
+      "vy": -0.031082870561616016,
+      "vx": -0.004354937958294122
+    },
+    {
+      "id": 20,
+      "label": "content",
+      "type": 0,
+      "size": 10,
+      "index": 19,
+      "x": 1221.8285852356914,
+      "y": 522.0749890404956,
+      "vy": -0.03159733393415872,
+      "vx": -0.0014964736962717225
+    },
+    {
+      "id": 21,
+      "label": "customer support",
+      "type": 0,
+      "size": 10,
+      "index": 20,
+      "x": 956.9172868498698,
+      "y": 284.25454048604837,
+      "vy": -0.043646992241395045,
+      "vx": -0.001152776339056985
+    },
+    {
+      "id": 22,
+      "label": "marketing and promotion",
+      "type": 0,
+      "size": 10,
+      "index": 21,
+      "x": 1294.5579994928644,
+      "y": 473.8340886738943,
+      "vy": -0.029666260635526687,
+      "vx": -0.005814648398914387
+    },
+    {
+      "id": 23,
+      "label": "security",
+      "type": 2,
+      "size": 32,
+      "index": 22,
+      "x": 869.1098941144535,
+      "y": 963.8251659801995,
+      "vy": -0.00609407601579347,
+      "vx": 0.007825014074170362
+    },
+    {
+      "id": 24,
+      "label": "advertising",
+      "type": 0,
+      "size": 10,
+      "index": 23,
+      "x": 1337.3012067373181,
+      "y": 406.26919618224855,
+      "vy": -0.030239580876581497,
+      "vx": -0.005089140146629619
+    },
+    {
+      "id": 25,
+      "label": "software program",
+      "type": 0,
+      "size": 10,
+      "index": 24,
+      "x": 1350.1366788468692,
+      "y": 327.305592824416,
+      "vy": -0.030145657231924184,
+      "vx": -0.004511304832693378
+    },
+    {
+      "id": 26,
+      "label": "data loss",
+      "type": 0,
+      "size": 10,
+      "index": 25,
+      "x": 992.3461217478076,
+      "y": 212.6028360952512,
+      "vy": -0.04247019190516751,
+      "vx": 0.004740256279405422
+    },
+    {
+      "id": 27,
+      "label": "laws and stndards",
+      "type": 0,
+      "size": 10,
+      "index": 26,
+      "x": 1000.7811311265699,
+      "y": 468.06189900000925,
+      "vy": -0.029557092272596584,
+      "vx": -0.005213928183043886
+    },
+    {
+      "id": 28,
+      "label": "service",
+      "type": 3,
+      "size": 20,
+      "index": 27,
+      "x": 906.9246609332243,
+      "y": 393.2891580736194,
+      "vy": -0.04031337340059244,
+      "vx": 0.0033542265422703
+    },
+    {
+      "id": 29,
+      "label": "the laws and judicial decisions of the State of Florida applicable to contracts entered into and performed entirely within the State of Florida",
+      "type": 0,
+      "size": 10,
+      "index": 28,
+      "x": 1357.1005517485385,
+      "y": 1092.8441652817876,
+      "vy": -0.022368605020509462,
+      "vx": 0.004699079563539073
+    }
+  ],
+  "links": [
+    {
+      "source": {
+        "id": 0,
+        "label": "WEB SITE HOSTING AGREEMENT",
+        "type": 1,
+        "size": 40,
+        "index": 0,
+        "x": 1366.2902842155083,
+        "y": 660.2938650643166,
+        "vy": -0.02810393774215856,
+        "vx": 0.0004333891276433242
+      },
+      "title": "commence on",
+      "target": {
+        "id": 1,
+        "label": "6th day of April, 1999",
+        "type": 0,
+        "size": 10,
+        "index": 1,
+        "x": 1562.5159063567926,
+        "y": 698.8712949665377,
+        "vy": -0.028922018961805462,
+        "vx": 0.0010532446835192731
+      },
+      "index": 0
+    },
+    {
+      "source": {
+        "id": 0,
+        "label": "WEB SITE HOSTING AGREEMENT",
+        "type": 1,
+        "size": 40,
+        "index": 0,
+        "x": 1366.2902842155083,
+        "y": 660.2938650643166,
+        "vy": -0.02810393774215856,
+        "vx": 0.0004333891276433242
+      },
+      "title": "commence on",
+      "target": {
+        "id": 2,
+        "label": "6th day of April, 1999",
+        "type": 0,
+        "size": 10,
+        "index": 2,
+        "x": 1561.9290726860336,
+        "y": 618.9084276396183,
+        "vy": -0.029716155859555924,
+        "vx": 0.0008675979442786812
+      },
+      "index": 1
+    },
+    {
+      "source": {
+        "id": 0,
+        "label": "WEB SITE HOSTING AGREEMENT",
+        "type": 1,
+        "size": 40,
+        "index": 0,
+        "x": 1366.2902842155083,
+        "y": 660.2938650643166,
+        "vy": -0.02810393774215856,
+        "vx": 0.0004333891276433242
+      },
+      "title": "be governed by",
+      "target": {
+        "id": 3,
+        "label": "govern law",
+        "type": 3,
+        "size": 20,
+        "index": 3,
+        "x": 1388.1967909121995,
+        "y": 911.8106477488168,
+        "vy": -0.023339837367584115,
+        "vx": 0.002264690880938366
+      },
+      "index": 2
+    },
+    {
+      "source": {
+        "id": 0,
+        "label": "WEB SITE HOSTING AGREEMENT",
+        "type": 1,
+        "size": 40,
+        "index": 0,
+        "x": 1366.2902842155083,
+        "y": 660.2938650643166,
+        "vy": -0.02810393774215856,
+        "vx": 0.0004333891276433242
+      },
+      "title": "be entered into",
+      "target": {
+        "id": 4,
+        "label": "State of Florida",
+        "type": 0,
+        "size": 10,
+        "index": 4,
+        "x": 1531.7488780211595,
+        "y": 772.6463053758665,
+        "vy": -0.02764173768505358,
+        "vx": 0.00017970603522793476
+      },
+      "index": 3
+    },
+    {
+      "source": {
+        "id": 0,
+        "label": "WEB SITE HOSTING AGREEMENT",
+        "type": 1,
+        "size": 40,
+        "index": 0,
+        "x": 1366.2902842155083,
+        "y": 660.2938650643166,
+        "vy": -0.02810393774215856,
+        "vx": 0.0004333891276433242
+      },
+      "title": "renew",
+      "target": {
+        "id": 5,
+        "label": "for one (1) or more one (1) month periods",
+        "type": 0,
+        "size": 10,
+        "index": 5,
+        "x": 1474.4729596259162,
+        "y": 828.4985136758149,
+        "vy": -0.027657162152552064,
+        "vx": 0.00016466496921413025
+      },
+      "index": 4
+    },
+    {
+      "source": {
+        "id": 0,
+        "label": "WEB SITE HOSTING AGREEMENT",
+        "type": 1,
+        "size": 40,
+        "index": 0,
+        "x": 1366.2902842155083,
+        "y": 660.2938650643166,
+        "vy": -0.02810393774215856,
+        "vx": 0.0004333891276433242
+      },
+      "title": "made",
+      "target": {
+        "id": 9,
+        "label": "i-on interactive",
+        "type": 1,
+        "size": 40,
+        "index": 9,
+        "x": 778.908454281023,
+        "y": 596.2547563423709,
+        "vy": -0.037787408321443505,
+        "vx": 0.00583561683222685
+      },
+      "index": 5
+    },
+    {
+      "source": {
+        "id": 0,
+        "label": "WEB SITE HOSTING AGREEMENT",
+        "type": 1,
+        "size": 40,
+        "index": 0,
+        "x": 1366.2902842155083,
+        "y": 660.2938650643166,
+        "vy": -0.02810393774215856,
+        "vx": 0.0004333891276433242
+      },
+      "title": "made",
+      "target": {
+        "id": 10,
+        "label": "The Customer",
+        "type": 1,
+        "size": 40,
+        "index": 10,
+        "x": 1150.2958746853187,
+        "y": 335.23753680440564,
+        "vy": -0.029185259407248764,
+        "vx": -0.004607317633224393
+      },
+      "index": 6
+    },
+    {
+      "source": {
+        "id": 10,
+        "label": "The Customer",
+        "type": 1,
+        "size": 40,
+        "index": 10,
+        "x": 1150.2958746853187,
+        "y": 335.23753680440564,
+        "vy": -0.029185259407248764,
+        "vx": -0.004607317633224393
+      },
+      "title": "is",
+      "target": {
+        "id": 11,
+        "label": "Centrack International",
+        "type": 0,
+        "size": 10,
+        "index": 11,
+        "x": 1053.0465602314202,
+        "y": 160.5503010332768,
+        "vy": -0.038655137062394214,
+        "vx": 0.009130591099669426
+      },
+      "index": 7
+    },
+    {
+      "source": {
+        "id": 9,
+        "label": "i-on interactive",
+        "type": 1,
+        "size": 40,
+        "index": 9,
+        "x": 778.908454281023,
+        "y": 596.2547563423709,
+        "vy": -0.037787408321443505,
+        "vx": 0.00583561683222685
+      },
+      "title": "maintain",
+      "target": {
+        "id": 6,
+        "label": "the Hosted Site",
+        "type": 1,
+        "size": 40,
+        "index": 6,
+        "x": 1148.8866691844617,
+        "y": 895.0784387905154,
+        "vy": -0.02781537659048536,
+        "vx": 0.00010732450708752367
+      },
+      "index": 8
+    },
+    {
+      "source": {
+        "id": 8,
+        "label": "Internet",
+        "type": 3,
+        "size": 20,
+        "index": 8,
+        "x": 944.0594605305661,
+        "y": 770.2132043951846,
+        "vy": -0.021446591114078428,
+        "vx": -0.006950559167598907
+      },
+      "title": "connectivity to",
+      "target": {
+        "id": 6,
+        "label": "the Hosted Site",
+        "type": 1,
+        "size": 40,
+        "index": 6,
+        "x": 1148.8866691844617,
+        "y": 895.0784387905154,
+        "vy": -0.02781537659048536,
+        "vx": 0.00010732450708752367
+      },
+      "index": 9
+    },
+    {
+      "source": {
+        "id": 7,
+        "label": "the Hosting Computer",
+        "type": 2,
+        "size": 32,
+        "index": 7,
+        "x": 511.2091887823154,
+        "y": 702.4054860776564,
+        "vy": -0.024906557482926257,
+        "vx": 0.010363578126942333
+      },
+      "title": "maintain",
+      "target": {
+        "id": 9,
+        "label": "i-on interactive",
+        "type": 1,
+        "size": 40,
+        "index": 9,
+        "x": 778.908454281023,
+        "y": 596.2547563423709,
+        "vy": -0.037787408321443505,
+        "vx": 0.00583561683222685
+      },
+      "index": 10
+    },
+    {
+      "source": {
+        "id": 13,
+        "label": "Microsoft Windows NT Server",
+        "type": 3,
+        "size": 20,
+        "index": 12,
+        "x": 515.208096404943,
+        "y": 910.3357974317825,
+        "vy": -0.024002893763788287,
+        "vx": 0.0015508012139371001
+      },
+      "title": "use",
+      "target": {
+        "id": 9,
+        "label": "i-on interactive",
+        "type": 1,
+        "size": 40,
+        "index": 9,
+        "x": 778.908454281023,
+        "y": 596.2547563423709,
+        "vy": -0.037787408321443505,
+        "vx": 0.00583561683222685
+      },
+      "index": 11
+    },
+    {
+      "source": {
+        "id": 14,
+        "label": "Microsoft Internet Information Service",
+        "type": 3,
+        "size": 20,
+        "index": 13,
+        "x": 684.8447737017443,
+        "y": 816.9528409008994,
+        "vy": -0.03178406296426758,
+        "vx": 0.014470769113897951
+      },
+      "title": "use",
+      "target": {
+        "id": 9,
+        "label": "i-on interactive",
+        "type": 1,
+        "size": 40,
+        "index": 9,
+        "x": 778.908454281023,
+        "y": 596.2547563423709,
+        "vy": -0.037787408321443505,
+        "vx": 0.00583561683222685
+      },
+      "index": 12
+    },
+    {
+      "source": {
+        "id": 15,
+        "label": "Microsoft SQL Server",
+        "type": 3,
+        "size": 20,
+        "index": 14,
+        "x": 661.423378989639,
+        "y": 975.2405322616876,
+        "vy": -0.0332560940969329,
+        "vx": 0.006330195344712524
+      },
+      "title": "use",
+      "target": {
+        "id": 9,
+        "label": "i-on interactive",
+        "type": 1,
+        "size": 40,
+        "index": 9,
+        "x": 778.908454281023,
+        "y": 596.2547563423709,
+        "vy": -0.037787408321443505,
+        "vx": 0.00583561683222685
+      },
+      "index": 13
+    },
+    {
+      "source": {
+        "id": 13,
+        "label": "Microsoft Windows NT Server",
+        "type": 3,
+        "size": 20,
+        "index": 12,
+        "x": 515.208096404943,
+        "y": 910.3357974317825,
+        "vy": -0.024002893763788287,
+        "vx": 0.0015508012139371001
+      },
+      "title": "use",
+      "target": {
+        "id": 7,
+        "label": "the Hosting Computer",
+        "type": 2,
+        "size": 32,
+        "index": 7,
+        "x": 511.2091887823154,
+        "y": 702.4054860776564,
+        "vy": -0.024906557482926257,
+        "vx": 0.010363578126942333
+      },
+      "index": 14
+    },
+    {
+      "source": {
+        "id": 14,
+        "label": "Microsoft Internet Information Service",
+        "type": 3,
+        "size": 20,
+        "index": 13,
+        "x": 684.8447737017443,
+        "y": 816.9528409008994,
+        "vy": -0.03178406296426758,
+        "vx": 0.014470769113897951
+      },
+      "title": "use",
+      "target": {
+        "id": 7,
+        "label": "the Hosting Computer",
+        "type": 2,
+        "size": 32,
+        "index": 7,
+        "x": 511.2091887823154,
+        "y": 702.4054860776564,
+        "vy": -0.024906557482926257,
+        "vx": 0.010363578126942333
+      },
+      "index": 15
+    },
+    {
+      "source": {
+        "id": 15,
+        "label": "Microsoft SQL Server",
+        "type": 3,
+        "size": 20,
+        "index": 14,
+        "x": 661.423378989639,
+        "y": 975.2405322616876,
+        "vy": -0.0332560940969329,
+        "vx": 0.006330195344712524
+      },
+      "title": "use",
+      "target": {
+        "id": 7,
+        "label": "the Hosting Computer",
+        "type": 2,
+        "size": 32,
+        "index": 7,
+        "x": 511.2091887823154,
+        "y": 702.4054860776564,
+        "vy": -0.024906557482926257,
+        "vx": 0.010363578126942333
+      },
+      "index": 16
+    },
+    {
+      "source": {
+        "id": 16,
+        "label": "Web site administration",
+        "type": 0,
+        "size": 10,
+        "index": 15,
+        "x": 584.0786864022477,
+        "y": 551.0709271062337,
+        "vy": -0.0289766570914322,
+        "vx": 0.0038049384881081293
+      },
+      "title": "provide",
+      "target": {
+        "id": 9,
+        "label": "i-on interactive",
+        "type": 1,
+        "size": 40,
+        "index": 9,
+        "x": 778.908454281023,
+        "y": 596.2547563423709,
+        "vy": -0.037787408321443505,
+        "vx": 0.00583561683222685
+      },
+      "index": 17
+    },
+    {
+      "source": {
+        "id": 17,
+        "label": "month report",
+        "type": 2,
+        "size": 32,
+        "index": 16,
+        "x": 1081.8767478966279,
+        "y": 615.015731658323,
+        "vy": -0.028616832793826853,
+        "vx": 0.0005241035554621664
+      },
+      "title": "provide",
+      "target": {
+        "id": 9,
+        "label": "i-on interactive",
+        "type": 1,
+        "size": 40,
+        "index": 9,
+        "x": 778.908454281023,
+        "y": 596.2547563423709,
+        "vy": -0.037787408321443505,
+        "vx": 0.00583561683222685
+      },
+      "index": 18
+    },
+    {
+      "source": {
+        "id": 17,
+        "label": "month report",
+        "type": 2,
+        "size": 32,
+        "index": 16,
+        "x": 1081.8767478966279,
+        "y": 615.015731658323,
+        "vy": -0.028616832793826853,
+        "vx": 0.0005241035554621664
+      },
+      "title": "have",
+      "target": {
+        "id": 6,
+        "label": "the Hosted Site",
+        "type": 1,
+        "size": 40,
+        "index": 6,
+        "x": 1148.8866691844617,
+        "y": 895.0784387905154,
+        "vy": -0.02781537659048536,
+        "vx": 0.00010732450708752367
+      },
+      "index": 19
+    },
+    {
+      "source": {
+        "id": 10,
+        "label": "The Customer",
+        "type": 1,
+        "size": 40,
+        "index": 10,
+        "x": 1150.2958746853187,
+        "y": 335.23753680440564,
+        "vy": -0.029185259407248764,
+        "vx": -0.004607317633224393
+      },
+      "title": "pay",
+      "target": {
+        "id": 9,
+        "label": "i-on interactive",
+        "type": 1,
+        "size": 40,
+        "index": 9,
+        "x": 778.908454281023,
+        "y": 596.2547563423709,
+        "vy": -0.037787408321443505,
+        "vx": 0.00583561683222685
+      },
+      "index": 20
+    },
+    {
+      "source": {
+        "id": 10,
+        "label": "The Customer",
+        "type": 1,
+        "size": 40,
+        "index": 10,
+        "x": 1150.2958746853187,
+        "y": 335.23753680440564,
+        "vy": -0.029185259407248764,
+        "vx": -0.004607317633224393
+      },
+      "title": "pay",
+      "target": {
+        "id": 18,
+        "label": "monthly fee",
+        "type": 0,
+        "size": 10,
+        "index": 17,
+        "x": 1283.0158757058884,
+        "y": 185.71897517511434,
+        "vy": -0.031553157564359384,
+        "vx": -0.004651397217449915
+      },
+      "index": 21
+    },
+    {
+      "source": {
+        "id": 10,
+        "label": "The Customer",
+        "type": 1,
+        "size": 40,
+        "index": 10,
+        "x": 1150.2958746853187,
+        "y": 335.23753680440564,
+        "vy": -0.029185259407248764,
+        "vx": -0.004607317633224393
+      },
+      "title": "pay",
+      "target": {
+        "id": 17,
+        "label": "month report",
+        "type": 2,
+        "size": 32,
+        "index": 16,
+        "x": 1081.8767478966279,
+        "y": 615.015731658323,
+        "vy": -0.028616832793826853,
+        "vx": 0.0005241035554621664
+      },
+      "index": 22
+    },
+    {
+      "source": {
+        "id": 10,
+        "label": "The Customer",
+        "type": 1,
+        "size": 40,
+        "index": 10,
+        "x": 1150.2958746853187,
+        "y": 335.23753680440564,
+        "vy": -0.029185259407248764,
+        "vx": -0.004607317633224393
+      },
+      "title": "acknowledge",
+      "target": {
+        "id": 19,
+        "label": "interruption",
+        "type": 0,
+        "size": 10,
+        "index": 18,
+        "x": 1331.022081857802,
+        "y": 249.6742370014957,
+        "vy": -0.031082870561616016,
+        "vx": -0.004354937958294122
+      },
+      "index": 23
+    },
+    {
+      "source": {
+        "id": 10,
+        "label": "The Customer",
+        "type": 1,
+        "size": 40,
+        "index": 10,
+        "x": 1150.2958746853187,
+        "y": 335.23753680440564,
+        "vy": -0.029185259407248764,
+        "vx": -0.004607317633224393
+      },
+      "title": "is responsible",
+      "target": {
+        "id": 6,
+        "label": "the Hosted Site",
+        "type": 1,
+        "size": 40,
+        "index": 6,
+        "x": 1148.8866691844617,
+        "y": 895.0784387905154,
+        "vy": -0.02781537659048536,
+        "vx": 0.00010732450708752367
+      },
+      "index": 24
+    },
+    {
+      "source": {
+        "id": 10,
+        "label": "The Customer",
+        "type": 1,
+        "size": 40,
+        "index": 10,
+        "x": 1150.2958746853187,
+        "y": 335.23753680440564,
+        "vy": -0.029185259407248764,
+        "vx": -0.004607317633224393
+      },
+      "title": "is responsible",
+      "target": {
+        "id": 20,
+        "label": "content",
+        "type": 0,
+        "size": 10,
+        "index": 19,
+        "x": 1221.8285852356914,
+        "y": 522.0749890404956,
+        "vy": -0.03159733393415872,
+        "vx": -0.0014964736962717225
+      },
+      "index": 25
+    },
+    {
+      "source": {
+        "id": 10,
+        "label": "The Customer",
+        "type": 1,
+        "size": 40,
+        "index": 10,
+        "x": 1150.2958746853187,
+        "y": 335.23753680440564,
+        "vy": -0.029185259407248764,
+        "vx": -0.004607317633224393
+      },
+      "title": "is responsible",
+      "target": {
+        "id": 21,
+        "label": "customer support",
+        "type": 0,
+        "size": 10,
+        "index": 20,
+        "x": 956.9172868498698,
+        "y": 284.25454048604837,
+        "vy": -0.043646992241395045,
+        "vx": -0.001152776339056985
+      },
+      "index": 26
+    },
+    {
+      "source": {
+        "id": 10,
+        "label": "The Customer",
+        "type": 1,
+        "size": 40,
+        "index": 10,
+        "x": 1150.2958746853187,
+        "y": 335.23753680440564,
+        "vy": -0.029185259407248764,
+        "vx": -0.004607317633224393
+      },
+      "title": "is responsible",
+      "target": {
+        "id": 22,
+        "label": "marketing and promotion",
+        "type": 0,
+        "size": 10,
+        "index": 21,
+        "x": 1294.5579994928644,
+        "y": 473.8340886738943,
+        "vy": -0.029666260635526687,
+        "vx": -0.005814648398914387
+      },
+      "index": 27
+    },
+    {
+      "source": {
+        "id": 10,
+        "label": "The Customer",
+        "type": 1,
+        "size": 40,
+        "index": 10,
+        "x": 1150.2958746853187,
+        "y": 335.23753680440564,
+        "vy": -0.029185259407248764,
+        "vx": -0.004607317633224393
+      },
+      "title": "is responsible",
+      "target": {
+        "id": 23,
+        "label": "security",
+        "type": 2,
+        "size": 32,
+        "index": 22,
+        "x": 869.1098941144535,
+        "y": 963.8251659801995,
+        "vy": -0.00609407601579347,
+        "vx": 0.007825014074170362
+      },
+      "index": 28
+    },
+    {
+      "source": {
+        "id": 10,
+        "label": "The Customer",
+        "type": 1,
+        "size": 40,
+        "index": 10,
+        "x": 1150.2958746853187,
+        "y": 335.23753680440564,
+        "vy": -0.029185259407248764,
+        "vx": -0.004607317633224393
+      },
+      "title": "is responsible",
+      "target": {
+        "id": 24,
+        "label": "advertising",
+        "type": 0,
+        "size": 10,
+        "index": 23,
+        "x": 1337.3012067373181,
+        "y": 406.26919618224855,
+        "vy": -0.030239580876581497,
+        "vx": -0.005089140146629619
+      },
+      "index": 29
+    },
+    {
+      "source": {
+        "id": 10,
+        "label": "The Customer",
+        "type": 1,
+        "size": 40,
+        "index": 10,
+        "x": 1150.2958746853187,
+        "y": 335.23753680440564,
+        "vy": -0.029185259407248764,
+        "vx": -0.004607317633224393
+      },
+      "title": "is responsible",
+      "target": {
+        "id": 25,
+        "label": "software program",
+        "type": 0,
+        "size": 10,
+        "index": 24,
+        "x": 1350.1366788468692,
+        "y": 327.305592824416,
+        "vy": -0.030145657231924184,
+        "vx": -0.004511304832693378
+      },
+      "index": 30
+    },
+    {
+      "source": {
+        "id": 10,
+        "label": "The Customer",
+        "type": 1,
+        "size": 40,
+        "index": 10,
+        "x": 1150.2958746853187,
+        "y": 335.23753680440564,
+        "vy": -0.029185259407248764,
+        "vx": -0.004607317633224393
+      },
+      "title": "acknowledge",
+      "target": {
+        "id": 26,
+        "label": "data loss",
+        "type": 0,
+        "size": 10,
+        "index": 25,
+        "x": 992.3461217478076,
+        "y": 212.6028360952512,
+        "vy": -0.04247019190516751,
+        "vx": 0.004740256279405422
+      },
+      "index": 31
+    },
+    {
+      "source": {
+        "id": 10,
+        "label": "The Customer",
+        "type": 1,
+        "size": 40,
+        "index": 10,
+        "x": 1150.2958746853187,
+        "y": 335.23753680440564,
+        "vy": -0.029185259407248764,
+        "vx": -0.004607317633224393
+      },
+      "title": "comply with",
+      "target": {
+        "id": 27,
+        "label": "laws and stndards",
+        "type": 0,
+        "size": 10,
+        "index": 26,
+        "x": 1000.7811311265699,
+        "y": 468.06189900000925,
+        "vy": -0.029557092272596584,
+        "vx": -0.005213928183043886
+      },
+      "index": 32
+    },
+    {
+      "source": {
+        "id": 10,
+        "label": "The Customer",
+        "type": 1,
+        "size": 40,
+        "index": 10,
+        "x": 1150.2958746853187,
+        "y": 335.23753680440564,
+        "vy": -0.029185259407248764,
+        "vx": -0.004607317633224393
+      },
+      "title": "use",
+      "target": {
+        "id": 28,
+        "label": "service",
+        "type": 3,
+        "size": 20,
+        "index": 27,
+        "x": 906.9246609332243,
+        "y": 393.2891580736194,
+        "vy": -0.04031337340059244,
+        "vx": 0.0033542265422703
+      },
+      "index": 33
+    },
+    {
+      "source": {
+        "id": 9,
+        "label": "i-on interactive",
+        "type": 1,
+        "size": 40,
+        "index": 9,
+        "x": 778.908454281023,
+        "y": 596.2547563423709,
+        "vy": -0.037787408321443505,
+        "vx": 0.00583561683222685
+      },
+      "title": "source",
+      "target": {
+        "id": 28,
+        "label": "service",
+        "type": 3,
+        "size": 20,
+        "index": 27,
+        "x": 906.9246609332243,
+        "y": 393.2891580736194,
+        "vy": -0.04031337340059244,
+        "vx": 0.0033542265422703
+      },
+      "index": 34
+    },
+    {
+      "source": {
+        "id": 6,
+        "label": "the Hosted Site",
+        "type": 1,
+        "size": 40,
+        "index": 6,
+        "x": 1148.8866691844617,
+        "y": 895.0784387905154,
+        "vy": -0.02781537659048536,
+        "vx": 0.00010732450708752367
+      },
+      "title": "of",
+      "target": {
+        "id": 23,
+        "label": "security",
+        "type": 2,
+        "size": 32,
+        "index": 22,
+        "x": 869.1098941144535,
+        "y": 963.8251659801995,
+        "vy": -0.00609407601579347,
+        "vx": 0.007825014074170362
+      },
+      "index": 35
+    },
+    {
+      "source": {
+        "id": 8,
+        "label": "Internet",
+        "type": 3,
+        "size": 20,
+        "index": 8,
+        "x": 944.0594605305661,
+        "y": 770.2132043951846,
+        "vy": -0.021446591114078428,
+        "vx": -0.006950559167598907
+      },
+      "title": "not have",
+      "target": {
+        "id": 23,
+        "label": "security",
+        "type": 2,
+        "size": 32,
+        "index": 22,
+        "x": 869.1098941144535,
+        "y": 963.8251659801995,
+        "vy": -0.00609407601579347,
+        "vx": 0.007825014074170362
+      },
+      "index": 36
+    },
+    {
+      "source": {
+        "id": 3,
+        "label": "govern law",
+        "type": 3,
+        "size": 20,
+        "index": 3,
+        "x": 1388.1967909121995,
+        "y": 911.8106477488168,
+        "vy": -0.023339837367584115,
+        "vx": 0.002264690880938366
+      },
+      "title": "is",
+      "target": {
+        "id": 29,
+        "label": "the laws and judicial decisions of the State of Florida applicable to contracts entered into and performed entirely within the State of Florida",
+        "type": 0,
+        "size": 10,
+        "index": 28,
+        "x": 1357.1005517485385,
+        "y": 1092.8441652817876,
+        "vy": -0.022368605020509462,
+        "vx": 0.004699079563539073
+      },
+      "index": 37
+    }
+  ]
+};
+
+	    	//D3映射数据至HTML中
+	    	//g用于绘制所有边,selectALL选中所有的line,并绑定数据data(graph.links),enter().append("line")添加元素
+	    	//数据驱动文档,设置边的粗细
+	    	//前面定义var svg = d3.select("#svg1")
+	    	var link = svg.append("g").attr("class","links").selectAll("line").data(graph.links)
+	    	.enter().append("line").attr("stroke-width", function(d) {
+	    		//return Math.sqrt(d.value);
+	    		return 1; //所有线宽度均为1
+	    	});
+			var node = svg.append("g").attr("class", "nodes").attr("stroke-linecap", "round").attr("stroke-linejoin", "round")
+			.selectAll("g").data(graph.nodes)
+			.enter().append("g")
+			.call(d3.drag()
+				.on("start", dragstarted)
+				.on("drag", dragged)
+				.on("end", dragended)
+			);
+
+			node.append("circle").attr("r", function(d){
+				return d.size;
+			}).attr("fill", function(d){
+				return colors[d.type];
+			})			
+			.attr("name", function(d){
+				return d.id;
+			})
+			.attr("stroke", "none");
+
+			node.append("text")
+				.attr("x", 0)
+				.attr("y", "0.2em")
+				.attr("fill", "black")
+				.attr("stroke", "white")
+				.attr("stroke-width", function(d){
+					if(d.size <= 24){
+						return 1.2;
+					}
+					return d.size/20;
+				})
+				.attr("font-weight", "bold")
+				.attr("font-size", function(d){
+					if(d.size <= 24){
+						return 24;
+					}
+					return d.size;
+				})
+				.text(function(d){
+					return d.label;
+				})
+				.attr("text-anchor", "middle")
+	    	//圆增加title
+	    	node.append("title").text(function(d) {
+	    		return d.label;
+	    	})
+
+	    	//simulation中ticked数据初始化，并生成图形
+	    	simulation
+	            .nodes(graph.nodes)
+	            .on("tick", ticked);
+
+	        simulation.force("link")
+	            .links(graph.links);
+
+	        //ticked()函数确定link线的起始点x、y坐标 node确定中心点 文本通过translate平移变化
+	        function ticked() {
+	            link
+	                .attr("x1", function(d) {
+	                    return d.source.x;
+	                })
+	                .attr("y1", function(d) {
+	                    return d.source.y;
+	                })
+	                .attr("x2", function(d) {
+	                    return d.target.x;
+	                })
+	                .attr("y2", function(d) {
+	                    return d.target.y;
+	                });
+
+	            // node
+	            //     .attr("cx", function(d) {
+	            //         return d.x;
+	            //     })
+	            //     .attr("cy", function(d) {
+	            //         return d.y;
+	            //     });
+				node
+				.attr("transform", d => `translate(${d.x},${d.y})`);
+
+	            // text.
+	            // attr('transform', function(d) {
+	            //     return 'translate(' + d.x + ',' + (d.y + 10 / 2) + ')';
+	            // });
+	        }
+    			d3.select('#svg1 .nodes').selectAll('g').attr('class', '');
+           		d3.select('#svg1 .links').selectAll('line').attr('class', 'inactive');
+
+
+	    // Cross origin requests are only supported for protocol schemes: http, data, chrome, chrome-extension
+	    // 本地json数据需要放置服务器中请求 XAMPP
+
+
+	    //该变量保证拖动鼠标时，不会影响图形变换，默认为false未选中鼠标
+	    var dragging = false;
+
+	    //开始拖动并更新相应的点
+	    function dragstarted(d) {
+	        if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+	        d.fx = d.x;
+	        d.fy = d.y;
+	        dragging = true;
+	    }
+
+	    //拖动进行中
+	    function dragged(d) {
+	        d.fx = d3.event.x;
+	        d.fy = d3.event.y;
+	    }
+
+	    //拖动结束
+	    function dragended(d) {
+	        if (!d3.event.active) simulation.alphaTarget(0);
+	        d.fx = null;
+	        d.fy = null;
+	        dragging = false;
+	    }
+
+
+	    //span点击事件
+	    $('#mode span').click(function(event) {
+	    	//span都设置为不激活状态
+	        $('#mode span').removeClass('active');
+
+	        //点击的span被激活
+	        $(this).addClass('active');
+
+	        //text隐藏 nodes显示
+	        if ($(this).text() == '节点') {
+	            $('.texts text').hide();
+	            $('.nodes circle').show();
+	        } else {
+	            $('.texts text').show();
+	            $('.nodes circle').hide();
+	        }
+    	});
+
+	    //为svg1父元素下的.nodes circle元素绑定鼠标进入事件
+    	$('#svg1').on('mouseenter', '.nodes circle', function(event) {
+    		//通过变量dragging保证拖动鼠标时，其状态不受影响，从而改变图形
+    		//鼠标没有拖动才能处理事件
+    		if(!dragging) {
+    			//获取被选中元素的名字
+	    		var name = $(this).attr("name");
+
+	    		//选择#svg1 .nodes中所有的circle，再增加个class
+	    		d3.select('#svg1 .nodes').selectAll('circle').attr('class', function(d) {
+	    			//数据的id是否等于name,返回空
+	    			if(d.id==name) {
+	    				return '';
+	    			} 
+	    			//当前节点返回空，否则其他节点循环判断是否被隐藏起来(CSS设置隐藏)
+	    			else {
+	    				//links链接的起始节点进行判断,如果其id等于name则显示这类节点
+	    				//注意: graph=data
+	    				for (var i = 0; i < graph.links.length; i++) {
+	    					//如果links的起点等于name，并且终点等于正在处理的则显示
+		                    if (graph.links[i]['source'].id == name && graph.links[i]['target'].id == d.id) {
+		                        return '';
+		                    }
+		                    if (graph.links[i]['target'].id == name && graph.links[i]['source'].id == d.id) {
+		                        return '';
+		                    }
+		                }
+	                
+	    				return "inactive"; //前面CSS定义 .nodes circle.inactive
+	    			}
+	    		});
+				d3.select('#svg1 .nodes').selectAll('text').attr('class', function(d){
+					if(d.id==name) {
+	    				return '';
+	    			} 
+	    			//当前节点返回空，否则其他节点循环判断是否被隐藏起来(CSS设置隐藏)
+	    			else {
+	    				//links链接的起始节点进行判断,如果其id等于name则显示这类节点
+	    				//注意: graph=data
+	    				for (var i = 0; i < graph.links.length; i++) {
+	    					//如果links的起点等于name，并且终点等于正在处理的则显示
+		                    if (graph.links[i]['source'].id == name && graph.links[i]['target'].id == d.id) {
+		                        return '';
+		                    }
+		                    if (graph.links[i]['target'].id == name && graph.links[i]['source'].id == d.id) {
+		                        return '';
+		                    }
+		                }
+	                
+	    				return "inactive"; //前面CSS定义 .nodes circle.inactive
+	    			}
+				});
+				//d3.select("#svg1 .links").selectAll('line').attr('class', '');
+	    		//处理相邻的边line是否隐藏 注意 || 
+	    		d3.select("#svg1 .links").selectAll('line').attr('class', function(d) {
+	                if (d.source.id == name || d.target.id == name) {
+	                    return '';
+	                } else {
+	                    return 'inactive';
+	                }
+	            });
+    		}
+   		});
+
+    	//鼠标移开还原原图，显示所有隐藏的点及边
+    	$('#svg1').on('mouseleave', '.nodes circle', function(event) {
+    		//如果dragging为false才处理事件
+    		if(!dragging) {
+    			d3.select('#svg1 .nodes').selectAll('circle').attr('class', '');
+				d3.select('#svg1 .nodes').selectAll('text').attr('class', '');
+           		d3.select('#svg1 .links').selectAll('line').attr('class', 'inactive');
+    		} 
+	    });
+
+
+    	//鼠标进入文本显示相邻节点及边
+    	// $('#svg1').on('mouseenter', '.texts text', function(event) {
+	    //     if (!dragging) {
+	    //         var name = $(this).attr('name');
+
+	    //         $('#info h4').css('color', $(this).attr('fill')).text(name);
+	    //         $('#info p').remove();
+	    //         for (var key in info[name]) {
+	    //             if (typeof(info[name][key]) == 'object') {
+	    //                 continue;
+	    //             }
+	    //             if (key == 'url' || key == 'title' || key == 'name' || key == 'edited' || key == 'created' || key == 'homeworld') {
+	    //                 continue;
+	    //             }
+	    //             $('#info').append('<p><span>' + key + '</span>' + info[name][key] + '</p>');
+	    //         }
+
+	    //         d3.select('#svg1 .texts').selectAll('text').attr('class', function(d) {
+	    //             if (d.id == name) {
+	    //                 return '';
+	    //             }
+
+	    //             for (var i = 0; i < graph.links.length; i++) {
+	    //                 if (graph.links[i]['source'].id == name && graph.links[i]['target'].id == d.id) {
+	    //                     return '';
+	    //                 }
+	    //                 if (graph.links[i]['target'].id == name && graph.links[i]['source'].id == d.id) {
+	    //                     return '';
+	    //                 }
+	    //             }
+	    //             return 'inactive';
+	    //         });
+	    //         d3.select("#svg1 .links").selectAll('line').attr('class', function(d) {
+	    //             if (d.source.id == name || d.target.id == name) {
+	    //                 return '';
+	    //             } else {
+	    //                 return 'inactive';
+	    //             }
+	    //         });
+	    //     }
+	    // });
+
+    	// //鼠标移除文本还原相应节点及边
+	    // $('#svg1').on('mouseleave', '.texts text', function(event) {
+	    //     if (!dragging) {
+	    //         d3.select('#svg1 .texts').selectAll('text').attr('class', '');
+	    //         d3.select('#svg1 .links').selectAll('line').attr('class', '');
+	    //     }
+	    // });
+
+	});
+</script>
+</html>

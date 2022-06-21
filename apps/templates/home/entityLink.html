@@ -1,0 +1,77 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Entity {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+<style>
+
+</style>
+{% block content %}
+  <div class="container-fluid py-4">
+    <div class="row">
+      <div class="col-lg-6 col-7">
+        <h2>{{ documentData['input_name'] }}</h2>
+      </div>
+    </div>
+    <div class="row">
+
+      <div class="col-6" style="height: 74vh">
+          <div class="card my-4" style="height: 100%">
+              <div class="checking_area" id = "left">
+                  {{documentData['result']['EntityLink']}}
+              </div>
+          </div>
+      </div>
+      <div class="col-6">
+        <div class="card my-4">
+          <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+            <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
+              <h6 class="text-white text-capitalize ps-3">Entity Link</h6>
+            </div>
+          </div>
+          <div class="card-body px-0 py-0" id="content1">
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script>
+    var documentData = {{ documentData | tojson }};
+    var contractText = documentData['content'];
+    var data = documentData['result'];
+<!--    var contractList = contractText.split("");-->
+<!--        // add entitylink span-->
+<!--    for(var i = 0; i < data.EntityLink.length; i++){-->
+<!--        let beginPos = parseInt(data.EntityLink[i][1]);-->
+<!--        let endPos = beginPos + data.EntityLink[i][0].length - 1;-->
+<!--        let url = data.EntityLink[i][2];-->
+<!--        contractList[beginPos] = '<span class = "highlight" url =' + ' "'  + url + '">' + contractList[beginPos];-->
+<!--        contractList[endPos] = contractList[endPos] + '</span>';-->
+<!--    }-->
+
+
+    //join the content
+<!--    let contractContext = contractList.join("");-->
+    let left = document.getElementById("left");
+    left.innerHTML = '<div id = "contractResult">' + data.EntityLink + '</div>';
+
+    let allSpans = document.getElementsByClassName('highlight');
+        // console.log(allSpans);
+        // handle entity link spans event
+    for(var i = 0; i < allSpans.length; i++) {
+        var onBoard = false;
+        allSpans[i].onclick = function () {
+            var targetURL = this.getAttribute('url');
+            var entityLinkFrame = document.getElementById('content1');
+            entityLinkFrame.innerHTML = '<iframe class="card col-12 px-2 py-2" src = "' + targetURL + '" ></iframe>';
+        }
+
+    }
+</script>
+{% endblock javascripts %}
