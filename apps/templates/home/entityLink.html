@@ -13,13 +13,22 @@
       <div class="col-lg-6 col-7">
         <h2>{{ documentData['input_name'] }}</h2>
       </div>
+        <div class="col-4">
+            <div class="col-6 input-group input-group-outline">
+                  <label class="form-label">Set Limitation (e.g.90%)</label>
+                  <input id="limit_num" type="text" class="form-control" onfocus="focused(this)" onfocusout="defocused(this)">
+            </div>
+        </div>
+        <div class="col-2">
+            <button id ="Set_button" class="btn bg-gradient-primary mb-0">Review</button>
+        </div>
     </div>
     <div class="row">
 
       <div class="col-6" style="height: 74vh">
           <div class="card my-4" style="height: 100%">
               <div class="checking_area" id = "left">
-                  {{documentData['result']['EntityLink']}}
+
               </div>
           </div>
       </div>
@@ -27,10 +36,23 @@
         <div class="card my-4">
           <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
             <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-              <h6 class="text-white text-capitalize ps-3">Entity Link</h6>
+              <h6 class="text-white text-capitalize ps-3">Contract Review Result</h6>
             </div>
           </div>
-          <div class="card-body px-0 py-0" id="content1">
+          <div class="card-body px-0 pb-2" id = "review-body">
+            <div class="table-responsive p-0" >
+              <table class="table align-items-center justify-content-center mb-0">
+<!--                <thead>-->
+<!--                  <tr>-->
+<!--                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Title</th>-->
+<!--                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder text-center opacity-7 ps-2">Accuracy</th>-->
+<!--                    <th></th>-->
+<!--                  </tr>-->
+<!--                </thead>-->
+                <tbody id = "content1">
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -45,23 +67,105 @@
     var documentData = {{ documentData | tojson }};
     var contractText = documentData['content'];
     var data = documentData['result'];
-<!--    var contractList = contractText.split("");-->
-<!--        // add entitylink span-->
-<!--    for(var i = 0; i < data.EntityLink.length; i++){-->
-<!--        let beginPos = parseInt(data.EntityLink[i][1]);-->
-<!--        let endPos = beginPos + data.EntityLink[i][0].length - 1;-->
-<!--        let url = data.EntityLink[i][2];-->
-<!--        contractList[beginPos] = '<span class = "highlight" url =' + ' "'  + url + '">' + contractList[beginPos];-->
-<!--        contractList[endPos] = contractList[endPos] + '</span>';-->
-<!--    }-->
+    console.log(data.EntityLink);
+    var contractList = contractText.split("");
+        // add entitylink span
+  for(var i = 0; i < data.EntityLink.length; i++){
+      let beginPos = data.EntityLink[i].start;
+      let endPos = data.EntityLink[i].end;
+      let url = data.EntityLink[i].kb_id;
+      contractList[beginPos] = '<span class = "highlight" url =' + ' "'  + url + '" id = "el' + i + '">' + contractList[beginPos];
+      contractList[endPos] = contractList[endPos] + '</span>';
+  }
+    //handle review
+    var scoreLimit = 0.0;
 
+    var setButton = document.getElementById("Set_button");
+    setButton.onclick = function(){
+        var limit = document.getElementById("limit_num");
+        scoreLimit = limit.value;
+    }
+    let annoStore = {};
+    let sameStart = {};
+    let lastBeg = -1;
+    let firstEnd = -1;
+    let minScore = 1.0;
+    for(let i = 0; i < data.Review.length; i++){
+        let beginPos = data.Review[i].start;
+
+        if(beginPos == lastBeg){
+            sameStart[data.Review[i].score] = {"answer": data.Review[i].answer, "annotation": data.Review[i].annotation};
+            if(data.Review[i].score < minScore){
+                minScore = data.Review[i].score;
+            }
+        }else{
+            if(lastBeg != -1){
+                annoStore[lastBeg] = sameStart;
+                sameStart = {};
+                contractList[lastBeg] = '<span class = "review" minScore = "' + minScore + '" id = "pos'+ lastBeg + '" >' + contractList[lastBeg];
+                contractList[firstEnd] = contractList[firstEnd] + '</span>';
+                minScore = 1.0;
+            }
+            sameStart[data.Review[i].score] = {"answer": data.Review[i].answer, "annotation": data.Review[i].annotation};
+            minScore = data.Review[i].score;
+            lastBeg = beginPos;
+            firstEnd = data.Review[i].end;
+
+        }
+     }
+    annoStore[lastBeg] = sameStart;
+    contractList[lastBeg] = '<span class = "review" minScore = "' + minScore + '" id = "pos'+ lastBeg +'" >' + contractList[lastBeg];
+    contractList[firstEnd] = contractList[firstEnd] + '</span>';
 
     //join the content
-<!--    let contractContext = contractList.join("");-->
+    let contractContext = contractList.join("");
     let left = document.getElementById("left");
-    left.innerHTML = '<div id = "contractResult">' + data.EntityLink + '</div>';
+    left.innerHTML = '<div id = "contractResult">' + contractContext + '</div>';
+
+    let totalRow = 0;
+    //handle right
+        let allReviews = document.getElementsByClassName('review');
+        totalRow += allReviews.length;
+        for(let i = 0; i < allReviews.length; i++) {
+            allReviews[i].onclick = function () {
+                let reviewContent = document.getElementById('content1');
+                let startPos = this.id.substring(3);
+                let reviewData = annoStore[startPos];
+                let content = "";
+                let color = "";
+                for (let score in reviewData) {
+                    //remove low score data
+                    score = parseFloat(score);
+                    var score100 = (score * 100).toFixed(2);
+                    if (score100 < scoreLimit) {
+                        continue;
+                    }
+                    else if(score100 <= 60.0){
+                        color = "secondary";
+                    }
+                    else if(score100 <= 70.0){
+                        color = "primary";
+                    }
+                    else if(score100 <= 80.0){
+                        color = "warning";
+                    }
+                    else if(score100 <= 90.0){
+                        color = "success";
+                    }else{
+                        color = "info";
+                    }
+                    content = content + '<tr><td><div class="d-flex px-2"><div class="my-auto"><h6 class="mb-0 text-sm">'+ reviewData[score].annotation + '</h6></div></div></td>'
+                        +'<td class="align-middle text-center"><div class="d-flex align-items-center justify-content-center"><span class="me-2 text-xs font-weight-bold">' + score100 + '</span>'
+                        +'<div><div class="progress"><div class="progress-bar bg-gradient-' + color+'" role="progressbar" aria-valuenow="' + score100 + '" aria-valuemin="0" aria-valuemax="' + score100+ '" style="width:' + score100 + '%;"></div> </div> </div> </div> </td>'
+                        +'<td class="align-middle"><button class="btn btn-link text-secondary mb-0"><i class="fa fa-ellipsis-v text-xs"></i> </button> </td> </tr>'
+                }
+
+                reviewContent.innerHTML = content;
+            }
+        }
 
     let allSpans = document.getElementsByClassName('highlight');
+    totalRow += allSpans.length;
         // console.log(allSpans);
         // handle entity link spans event
     for(var i = 0; i < allSpans.length; i++) {
@@ -72,6 +176,15 @@
             entityLinkFrame.innerHTML = '<iframe class="card col-12 px-2 py-2" src = "' + targetURL + '" ></iframe>';
         }
 
+    }
+    let allResult = document.getElementById("contractResult").getElementsByTagName("span");
+    for(var i = 0; i < allResult.length; i++){
+      var entityLinkFrame = document.getElementById('content1');
+      var unit = document.createElement("tr");
+
+      unit.setAttribute("class", "card review_unit");
+      unit.innerHTML = '<div class = "review_container"> <div class = "review_wrap">' + allResult[i].textContent + ' </div></div>'
+      entityLinkFrame.appendChild(unit);
     }
 </script>
 {% endblock javascripts %}

@@ -31,4 +31,5 @@ apps/static/assets/node_modules
 apps/static/assets/yarn.lock
 apps/static/assets/.temp
 legal_annotator
+retrieval_code_master
 

@@ -17607,3 +17607,42 @@ pre[class*="language-"] {
 .long_sentence{
   width: 430px !important;
 }
+
+.review_unit {
+    max-height: 40vh;
+    border: 1px solid rgba(0, 0, 0, 0.125) !important;
+}
+
+.review_container {
+    position: relative;
+    width: 100%;
+    padding: 1vh;
+    color: rgba(0, 0, 0, 0.7);
+    cursor: pointer;
+    overflow: hidden;
+    white-space: normal;
+    transition: all 0.5s linear;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+    max-height: 8vh;
+    /*background-image: linear-gradient(45deg, #bdbcbc, #ffffff);*/
+}
+
+.review_container:hover {
+    max-height: 40vh;
+    background-color: azure;
+    overflow: scroll;
+    white-space: normal;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.review_wrap {
+    position: relative;
+    left: 0;
+    top: 0;
+}
+
+::-webkit-scrollbar {
+
+  display: none !important; /* Chrome Safari */
+
+}
