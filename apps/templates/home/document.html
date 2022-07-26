@@ -3,7 +3,9 @@
 {% block title %} Document {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}
+<link href="https://unpkg.com/@wangeditor/editor@latest/dist/css/style.css" rel="stylesheet">
+{% endblock stylesheets %}
 
 {% block content %}
 <div class="container-fluid py-4">
@@ -17,9 +19,13 @@
 <!--          <div class="{% if processed == 'false' %} col-12 {% else %} col-6 {% endif %}" style = "height: {% if processed == 'false' %}60vh{% else %}74vh{% endif %}" >-->
           <div class="col-12" style = "height:60vh" >
               <div class="card my-4" style="height:100%">
-                  <textarea name = "content" class="checking_area" style="height: 100%" placeholder="Please type your contract...">{{ documentData['content'] }}</textarea>
+                  <div id="toolbar-container"><!-- 工具栏 --></div>
+
+                  <div id="editor-container" class="checking_area" style="height: 100%" placeholder="Please type your contract...">{{ documentData['content'] }}</div>
+
               </div>
           </div>
+        <input type="hidden" id="realContent" name="content" >
 <!--          {% if processed == 'true' %}-->
 <!--            <div class="col-6" style="height: 74vh">-->
 <!--                <div class ="card my-4" style="height:100%"></div>-->
@@ -41,7 +47,35 @@
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
-<script>
+<script src="https://unpkg.com/@wangeditor/editor@latest/dist/index.js"></script>
 
+<script>
+const { createEditor, createToolbar } = window.wangEditor
+let inputContent = document.getElementById("realContent")
+
+
+const editorConfig = {
+    placeholder: 'Type here...',
+    onChange(editor) {
+      const html = editor.getText()
+      inputContent.value = editor.getText()
+    }
+}
+
+const editor = createEditor({
+    selector: '#editor-container',
+    html: '<p><br></p>',
+    config: editorConfig,
+    mode: 'default',
+})
+
+const toolbarConfig = {}
+
+const toolbar = createToolbar({
+    editor,
+    selector: '#toolbar-container',
+    config: toolbarConfig,
+    mode: 'default',
+})
 </script>
 {% endblock javascripts %}

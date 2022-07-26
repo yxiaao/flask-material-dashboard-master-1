@@ -43,6 +43,7 @@ def index():
 @login_required
 def processFile():
     if request.method == 'POST':
+        print(request.form)
         global document_Data
         # result = handleContract(request.form['content'])
         global has_processed
