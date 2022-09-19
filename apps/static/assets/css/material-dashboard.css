@@ -17615,14 +17615,15 @@ pre[class*="language-"] {
 
 .review_container {
     position: relative;
-    width: 100%;
+    width: 90%;
     padding: 1vh;
+    margin: 2vh 1vh;
     color: rgba(0, 0, 0, 0.7);
     cursor: pointer;
     overflow: hidden;
     white-space: normal;
     transition: all 0.5s linear;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.2) !important;
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.2) !important; */
     max-height: 8vh;
     /*background-image: linear-gradient(45deg, #bdbcbc, #ffffff);*/
 }

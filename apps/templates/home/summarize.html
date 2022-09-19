@@ -47,40 +47,40 @@
         let right = document.getElementById('summarized_right');
 
 
-        {#let summarizedContract = "";#}
+        // {#let summarizedContract = "";#}
         let paragraphContract = "";
         for(let i = 0; i < data.sum.length; i++){
-            paragraphContract = paragraphContract + '<div class = "para_jump" >' + data.para[i].text + '</div>' + "\r\n\r\n";
-            {#summarizedContract = summarizedContract + '<div class = "sum_para" id = "sum' + i + '">' + data.sum[i].text + '</div>' + "\r\n\r\n";#}
+            paragraphContract = paragraphContract + '<div class = "para_jump" >' + data.para[i] + '</div>' + "\r\n\r\n";
+            // {#summarizedContract = summarizedContract + '<div class = "sum_para" id = "sum' + i + '">' + data.sum[i].text + '</div>' + "\r\n\r\n";#}
         }
         left.innerHTML = paragraphContract;
-        {#right.innerHTML = summarizedContract;#}
+        // {#right.innerHTML = summarizedContract;#}
 
         let paras = document.getElementsByClassName("para_jump");
         for(let i = 0; i < paras.length; i++){
             paras[i].onclick = function(){
-                right.innerHTML = '<div class = "sum_para" id = "sum' + i + '">' + data.sum[i].text + '</div>';
+                right.innerHTML = '<div class = "sum_para" id = "sum' + i + '">' + data.sum[i] + '</div>';
             }
         }
-        {##}
-        {#let flag = true;#}
-        {#let scale = (left.scrollHeight - left.clientHeight) / (right.scrollHeight - right.clientHeight);#}
-        {#left.addEventListener('mouseover', function(e){#}
-        {#    flag = false;#}
-        {#    left.addEventListener('scroll',function(e){#}
-        {#        if(!flag){#}
-        {#            right.scrollTop = left.scrollTop / scale;#}
-        {#        }#}
-        {#    })#}
-        {# });#}
-        {#right.addEventListener('mouseover', function (e) {#}
-        {#    flag = true;#}
-        {#    right.addEventListener('scroll',function(e){#}
-        {#        if(flag){#}
-        {#            left.scrollTop = right.scrollTop * scale;#}
-        {#        }#}
-        {#    })#}
-        {# })#}
+        // {##}
+        // {#let flag = true;#}
+        // {#let scale = (left.scrollHeight - left.clientHeight) / (right.scrollHeight - right.clientHeight);#}
+        // {#left.addEventListener('mouseover', function(e){#}
+        // {#    flag = false;#}
+        // {#    left.addEventListener('scroll',function(e){#}
+        // {#        if(!flag){#}
+        // {#            right.scrollTop = left.scrollTop / scale;#}
+        // {#        }#}
+        // {#    })#}
+        // {# });#}
+        // {#right.addEventListener('mouseover', function (e) {#}
+        // {#    flag = true;#}
+        // {#    right.addEventListener('scroll',function(e){#}
+        // {#        if(flag){#}
+        // {#            left.scrollTop = right.scrollTop * scale;#}
+        // {#        }#}
+        // {#    })#}
+        // {# })#}
    </script>
 {% endblock javascripts %}
 

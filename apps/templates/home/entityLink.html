@@ -39,16 +39,10 @@
               <h6 class="text-white text-capitalize ps-3">Contract Review Result</h6>
             </div>
           </div>
-          <div class="card-body px-0 pb-2" id = "review-body">
+          <div class="card-body px-3 pb-2" id = "review-body">
             <div class="table-responsive p-0" >
               <table class="table align-items-center justify-content-center mb-0">
-<!--                <thead>-->
-<!--                  <tr>-->
-<!--                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Title</th>-->
-<!--                    <th class="text-uppercase text-secondary text-xxs font-weight-bolder text-center opacity-7 ps-2">Accuracy</th>-->
-<!--                    <th></th>-->
-<!--                  </tr>-->
-<!--                </thead>-->
+
                 <tbody id = "content1">
                 </tbody>
               </table>
@@ -75,7 +69,7 @@
       let beginPos = data.EntityLink[i].start;
       let endPos = data.EntityLink[i].end;
       let url = data.EntityLink[i].kb_id;
-      contractList[beginPos] = '<a href = "#unit_el' + i + '"class = "highlight" url =' + ' "'  + url + '" id = "enl' + i + '">' + contractList[beginPos];
+      contractList[beginPos] = '<a href = "#unit_enl' + i + '"class = "highlight" url =' + ' "'  + url + '" id = "enl' + i + '">' + contractList[beginPos];
       contractList[endPos] = contractList[endPos] + '</a>';
   }
     //handle review
@@ -123,6 +117,7 @@
     let left = document.getElementById("left");
     left.innerHTML = '<div id = "contractResult">' + contractContext + '</div>';
 
+    /*
     // let totalRow = 0;
     // //handle right
     //     let allReviews = document.getElementsByClassName('review');
@@ -179,6 +174,7 @@
     //     }
 
     // }
+    */
     let allResult = document.getElementById("contractResult").getElementsByTagName("a");
     let lastContainer = null;
     // let lastContent = "";
@@ -186,6 +182,7 @@
       var entityLinkFrame = document.getElementById('content1');
       var unit = document.createElement("tr");
       
+      /*
       allResult[i].onclick = function(){
         let curContainer = document.getElementById("unit_"+this.id);
         // let targetURL = this.getAttribute('url');
@@ -228,19 +225,36 @@
           }
           curContainer.innerHTML = content;
         }
+        */
+        // let curContainer = document.getElementById("unit_"+ allResult[i].id);
+        // let targetURL = this.getAttribute('url');
+        // //entity link click handle
+        // let curContent = curContainer.innerHTML;
 
-        //Track the target unit
-        if(lastContainer){
-          lastContainer.style.maxHeight = "8vh"
-          // lastContainer.innerHTML = lastContent;
+      allResult[i].onclick = function(){
+        let curContainer = document.getElementById("unit_"+ this.id);
+          //Track the target unit
+          if(lastContainer){
+            lastContainer.style.maxHeight = "8vh";
+            // lastContainer.innerHTML = lastContent;
+          }
+          if(lastContainer == curContainer){
+            lastContainer = null;
+            return;
+          }
+          curContainer.style.maxHeight = "60vh";
+          // lastContent = curContent;
+          lastContainer = curContainer;
         }
-        curContainer.style.maxHeight = "60vh";
-        // lastContent = curContent;
-        lastContainer = curContainer;
-      }
       unit.id = "unit_" + allResult[i].id;
       unit.setAttribute("class", "card review_container review_unit");
-      unit.innerHTML = (allResult[i].id.substring(0,3) == "enl" ? "EntityLink: " : "Review: ") + allResult[i].textContent ;
+      if(allResult[i].id.substring(0,3) == "enl"){
+        unit.setAttribute("style", "background-color: rgba(173, 235, 245, 0.08)");
+      }else{
+        unit.setAttribute("style", "background-color: rgba(255, 0, 191, 0.05)");
+      }
+
+      // unit.innerHTML = (allResult[i].id.substring(0,3) == "enl" ? "EntityLink: " : "Review: ") + allResult[i].textContent ;
 
       entityLinkFrame.appendChild(unit);
     }
@@ -254,14 +268,63 @@
       let target = document.getElementById(targetID);
       allUnit[i].onclick = function(){
         let curContainer = this;
+        // let curContent = curContainer.innerHTML;
+        // if(type == "enl"){
+        //   let targetURL = target.getAttribute('url');
+        //   curContainer.innerHTML = '<iframe class="card col-12 px-2 py-2" src = "' + targetURL + '" ></iframe>';       
+        // }else if(type == "pos"){
+        //   let startPos = target.id.substring(3);
+        //   let reviewData = annoStore[startPos];
+        //   let content = "";
+        //   let color = "";
+        //   for (let score in reviewData) {
+        //       //remove low score data
+        //       score = parseFloat(score);
+        //       var score100 = (score * 100).toFixed(2);
+        //       if (score100 < scoreLimit) {
+        //           continue;
+        //       }
+        //       else if(score100 <= 60.0){
+        //           color = "secondary";
+        //       }
+        //       else if(score100 <= 70.0){
+        //           color = "primary";
+        //       }
+        //       else if(score100 <= 80.0){
+        //           color = "warning";
+        //       }
+        //       else if(score100 <= 90.0){
+        //           color = "success";
+        //       }else{
+        //           color = "info";
+        //       }
+        //       content = content + '<td><div class="d-flex px-2"><div class="my-auto me-6"><h6 class="mb-0 text-sm">'+ reviewData[score].annotation + '</h6></div>'
+        //           +'<div class="d-flex align-items-center justify-content-center"><span class="me-2 text-xs font-weight-bold">' + score100 + '</span>'
+        //           +'<div><div class="progress"><div class="progress-bar bg-gradient-' + color+'" role="progressbar" aria-valuenow="' + score100 + '" aria-valuemin="0" aria-valuemax="' + score100+ '" style="width:' + score100 + '%;"></div> </div> </div> </div>'
+        //           +'<button class="ms-8 mb-0 btn btn-link text-secondary mb-0"><i class="fa fa-ellipsis-v text-xs"></i> </button> </div> </td>'
+        //   }
+          // curContainer.innerHTML = content;
+        // }
+        // let targetURL = this.getAttribute('url');
+        // //entity link click handle
+        //Track the target unit
+        if(lastContainer){
+          lastContainer.style.maxHeight = "8vh"
+          // lastContainer.innerHTML = lastContent;
+        }
+        curContainer.style.maxHeight = "60vh";
+        // lastContent = curContent;
+        lastContainer = curContainer;        
+    }
+        let curContainer = allUnit[i];
         let curContent = curContainer.innerHTML;
         if(type == "enl"){
           let targetURL = target.getAttribute('url');
-          curContainer.innerHTML = '<iframe class="card col-12 px-2 py-2" src = "' + targetURL + '" ></iframe>';       
+          curContainer.innerHTML = '<h4 class = "text-capitalize py-1">' + target.innerText + '</h4><iframe class="card col-12 px-2 py-2" src = "' + targetURL + '" ></iframe>';       
         }else if(type == "pos"){
           let startPos = target.id.substring(3);
           let reviewData = annoStore[startPos];
-          let content = "";
+          let content = '<h4 class = "text-capitalize py-1">' + target.innerText + '</h4>';
           let color = "";
           for (let score in reviewData) {
               //remove low score data
@@ -291,18 +354,6 @@
           }
           curContainer.innerHTML = content;
         }
-        // let targetURL = this.getAttribute('url');
-        // //entity link click handle
-        //Track the target unit
-        if(lastContainer){
-          lastContainer.style.maxHeight = "8vh"
-          lastContainer.innerHTML = lastContent;
-        }
-        curContainer.style.maxHeight = "60vh";
-        lastContent = curContent;
-        lastContainer = curContainer;        
-      }
-
     }
 </script>
 {% endblock javascripts %}

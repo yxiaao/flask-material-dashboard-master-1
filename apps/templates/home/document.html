@@ -52,7 +52,10 @@
 <script>
 const { createEditor, createToolbar } = window.wangEditor
 let inputContent = document.getElementById("realContent")
-
+<!--var documentData = {{ documentData | tojson }};-->
+<!--var contractText = documentData['content'];-->
+<!--if(contract-->
+<!--const myhtml = contractText.split(/\n/).map(line => `<p>${line}</p>`).join('\n');-->
 
 const editorConfig = {
     placeholder: 'Type here...',
@@ -77,5 +80,6 @@ const toolbar = createToolbar({
     config: toolbarConfig,
     mode: 'default',
 })
+
 </script>
 {% endblock javascripts %}

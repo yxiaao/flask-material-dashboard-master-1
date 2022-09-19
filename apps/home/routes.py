@@ -19,6 +19,8 @@ from legal_annotator.annotator import Annotator
 # import ast
 # from retrieval_code_master.retrieval_demo_class import Retriever
 
+# Summarize model
+from transformers import T5Tokenizer, T5ForConditionalGeneration
 # Load Models
 # Entity Link
 nlp = en_core_web_lg.load()
@@ -31,6 +33,10 @@ anno_info_path = 'legal_annotator/CUAD_anno_info.txt'
 anno = Annotator(LM_checkpoint_path=LM_checkpoint_path, anno_info_path=anno_info_path)
 # Similarity
 # model = Retriever()
+
+#summarize
+tokenizer = T5Tokenizer.from_pretrained('t5-large')
+model = T5ForConditionalGeneration.from_pretrained('t5-large')
 
 
 @blueprint.route('/index')
@@ -61,7 +67,7 @@ def handleFile():
         global document_Data
         global has_processed
         f = request.files['input_file']
-        print(request.files)
+        # print(request.files)
         f.save('./apps/upload/' + f.filename)
         document = Document('./apps/upload/' + f.filename)
         document_Data['input_name'] = (f.filename.split('.'))[0]
@@ -148,15 +154,30 @@ def handleReview(content):
 
 
 def handleSummarize(content):
-    paragraph = []
+    paragraphes = content.split('\n')
+    for paragraph in paragraphes:
+        if paragraph.isspace():
+            paragraphes.remove(paragraph)
+
     summarized = []
-    with jsonlines.open('./apps/static/result/paragraph_summarization/outputs.jsonl', mode='r') as reader:
-        for row in reader:
-            summarized.append(row)
-    with jsonlines.open('./apps/static/result/paragraph_summarization/inputs.jsonl', mode='r') as reader:
-        for row in reader:
-            paragraph.append(row)
-    return {'para': paragraph, 'sum': summarized}
+    summ = []
+    kwargs = {'min_length': 1, 'max_length': 60, 'num_beams': 3, 'num_return_sequences': 1, 'repetition_penalty': 2.5}
+    for paragraph in paragraphes:
+        input_ids = tokenizer("summarize: " + paragraph, return_tensors="pt").input_ids  # Batch size 1
+        output = model.generate(input_ids, **kwargs)
+        summ.append(tokenizer.decode(output[0]).strip().replace('<pad>', ''))
+
+
+
+    print(summ)
+    # print(outputs)
+    # with jsonlines.open('./apps/static/result/paragraph_summarization/outputs.jsonl', mode='r') as reader:
+    #     for row in reader:
+    #         summarized.append(row)
+    # with jsonlines.open('./apps/static/result/paragraph_summarization/inputs.jsonl', mode='r') as reader:
+    #     for row in reader:
+    #         paragraph.append(row)
+    return {'para': paragraphes ,'sum': summ}
 
 
 def handleSimilarity(content):
